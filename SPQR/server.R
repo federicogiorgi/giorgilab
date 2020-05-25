@@ -27,6 +27,11 @@ function(input, output) {
       shinyjs::showElement("report2",anim = TRUE,animType = "slide")
     }
   })
+  observeEvent(nhits,{
+   if(nhits==0){
+     shinyjs::hideElement("report2",anim = TRUE,animType = "slide")
+   }
+  })
   
   
   ### Functions ----
@@ -54,6 +59,7 @@ function(input, output) {
     hitnames<<-gsub("^>","",unlist(getAnnot(multifasta)[anal]))
     nhits<-length(hits)
     return(paste0("Number of sequences matching pattern: ",nhits))
+    nhits<<-nhits
   }
   
   # R function that returns hit names

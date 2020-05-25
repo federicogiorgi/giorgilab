@@ -61,6 +61,7 @@ shinyUI(
                 
                 shinydashboard::dashboardBody(
                   shinyjs::useShinyjs(),
+                  #add_busy_spinner(spin = "fading-circle"),
                   tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
                   tags$head(
                     tags$link(rel="stylesheet",type="text/css",href="style.css")

@@ -46,14 +46,15 @@ shinyUI(
         font-size:14px;
         color:white;">
         <br>
-        <u3>Example sequence patterns:</u3>
+        Example sequence patterns:
         <ul>
         <li><strong>^CDE</strong> - <i>starting with CDE</i></li>
         <li><strong>FMG$</strong> - <i>ending with FMG</i></li>
         <li><strong>ALGT</strong> - <i>containing the sequence ALGT</i></li>
         <li><strong>^M...C</strong> - <i>starting with M, any aminoacid three times (...), then C</i></li>
         </ul>
-        <u3>Please refer to <a href=https://perlmaven.com/regex-cheat-sheet>PERL regex</a> for a full list of supported patterns.</u3>
+        <br>
+        Please refer to <a href=https://perlmaven.com/regex-cheat-sheet>PERL regex</a> for a full list of supported patterns.
       </p>'
       ),
       width = 400
