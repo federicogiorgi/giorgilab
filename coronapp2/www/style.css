@@ -1,4 +1,4 @@
-.bottone {
+.bbutton {
 	transition-duration: 0.4s;
 	background-color: black;
 	color: white;
@@ -6,7 +6,7 @@
 	border-radius: 12px;
 }
         
-.bottone:hover {
+.bbutton:hover {
 	background-color: #262222;
 	color: white;
 }

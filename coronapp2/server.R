@@ -14,7 +14,7 @@ function(input, output) {
   # Global variable declaration
   results<-c()
   headers<-c()
-  
+
   # Reference genome TODO: input by user
   genomefasta<-"data/NC_045512.2.fa"
   genomegff3<-"data/NC_045512.2_annot.gff3"
@@ -95,35 +95,51 @@ function(input, output) {
   
   # R part: plotting
   r02<-function(){
-    par(mfrow=c(2,3))
+    subheaders<-headers
+    country<-input$country
+    if(is.null(country)){country<-"World"}
+    countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
+    toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
+    colnames(toshow)[1:2]<-c("sample","country")
+    if(country!="World"){
+      toshow<-toshow[toshow$country==country,]
+      subheaders<-names(countries)[countries[headers]==country]
+      toshow<-toshow[!is.na(toshow$sample),]
+      toshow$sample<-as.character(toshow$sample)
+    }
+    
+    par(mfrow=c(2,3),cex=1.2)
     
     # Most mutated samples
-    occ<-sort(table(results$sample),dec=TRUE)[1:10]
+    occ<-sort(table(toshow$sample),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of mutations",main="Most mutated samples",col=heat.colors(length(occ)))
     
     # Mutations per sample
-    occ<-table(table(results$sample))
+    occ<-table(table(toshow$sample))
+    zeroes<-length(setdiff(subheaders,unique(toshow$sample)))
+    occ<-c(zeroes,occ)
+    names(occ)[1]<-"0"
     par(las=2,mar=c(5,5,5,1))
     barplot(occ,xlab="nr of mutations",main="Overall mutations per sample",col="cornflowerblue")
     
     # Variant classes
-    occ<-sort(table(results$varclass),dec=TRUE)
+    occ<-sort(table(toshow$varclass),dec=TRUE)
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of events",main="Most frequent events per class",col=heat.colors(length(occ)))
     
     # Variant class (A/T, etc)
-    occ<-sort(table(apply(results[,c("refvar","qvar")],1,paste0,collapse=">")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("refvar","qvar")],1,paste0,collapse=">")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of samples",main="Most frequent events per type",col=heat.colors(length(occ)))
     
     # Nucleotide events
-    occ<-sort(table(apply(results[,c("refvar","refpos","qvar")],1,paste0,collapse="")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("refvar","refpos","qvar")],1,paste0,collapse="")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of samples",main="Most frequent events (nucleotide)",col=heat.colors(length(occ)))
     
     # Protein events
-    occ<-sort(table(apply(results[,c("protein","variant")],1,paste0,collapse=":")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("protein","variant")],1,paste0,collapse=":")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of samples",main="Most frequent events (protein)",col=terrain.colors(length(occ)))
   }
@@ -153,14 +169,13 @@ function(input, output) {
   })
   
   output$plot01<-renderPlot({
-    # Input file with name, size, type, datapath
     if (!(is.null(input$fasta))){
-      r02() # basic plotting
+      r02()
     }
   })
   
   output$wwplot01<-renderPlot({
-    r02() # basic plotting
+    r02()
   })
   
   
@@ -174,6 +189,9 @@ function(input, output) {
     paste0("Total number of mutational events: ",nrow(results))
   })
 
+  output$country<-renderText({
+    paste0("Showing results for ",input$country)
+  })
   
   
   output$contents <- renderDataTable({
@@ -183,16 +201,23 @@ function(input, output) {
   })
   
   output$wwcontents <- renderDataTable({
+    country<-input$country
+    if(is.null(country)){country<-"World"}
     countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
     toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
     colnames(toshow)[1:2]<-c("sample","country")
+    if(country!="World"){
+      toshow<-toshow[toshow$country==country,]
+      toshow<-toshow[!is.na(toshow$sample),]
+      toshow$sample<-as.character(toshow$sample)
+    }
     return(toshow)
   })
   
   
   output$downloadCSV <- downloadHandler(
     filename = function() {
-      paste("results.csv", sep = "")
+      "myresults.csv"
     },
     content = function(file) {
       write.csv(results, file, row.names = FALSE)
@@ -201,17 +226,36 @@ function(input, output) {
   
   output$wwdownloadCSV<-downloadHandler(
     filename=function(){
-      return("results.csv")
+      country<-input$country
+      if(is.null(country)){country<-"World"}
+      if(country=="World"){
+        paste0("results_",country,".csv")
+      } else {
+        return("results.csv")
+      }
     },
     content=function(file){
-      file.copy("data/results.csv",file)
+      country<-input$country
+      if(is.null(country)){country<-"World"}
+      countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
+      toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
+      colnames(toshow)[1:2]<-c("sample","country")
+      if(country!="World"){
+        toshow<-toshow[toshow$country==country,]
+        toshow<-toshow[!is.na(toshow$sample),]
+        toshow$sample<-as.character(toshow$sample)
+        write.csv(toshow, file, row.names = FALSE)
+      } else {
+        file.copy("data/results.csv",file)
+      }
     }
   )
-  
+
+
   
   ### Lists for selects
   output$uiproteins<-renderUI({
-    selectizeInput("protein","Select Protein: ",
+    selectizeInput("uiprotein","Select Protein: ",
                    choices=as.list(names(niceproteins)),
                    selected="S")
   })
@@ -222,7 +266,7 @@ function(input, output) {
   })
   output$uicountries<-renderUI({
     selectizeInput("country","Select Country: ",
-                   choices=as.list(unique(c("World",metadata$country))),
+                   choices=as.list(unique(c("World",sort(metadata$country)))),
                    selected="World")
   })
   
@@ -230,9 +274,9 @@ function(input, output) {
   ### Visualize mutations over protein length
   output$googlevis <- renderGvis({
     ### Parameters
-    protein<-input$protein
-    log10<-input$log10
-    percentage<-input$percentage
+    protein<-input$uiprotein
+    log10<-input$uilog10
+    percentage<-input$uipercentage
     
     ### Process parameters
     # Select Protein
@@ -285,7 +329,8 @@ function(input, output) {
     log10<-input$wwlog10
     percentage<-input$wwpercentage
     country<-input$country
-    
+    if(is.null(country)){country<-"World"}
+
     ### Process parameters
     # Select Protein
     niceprotein<-niceproteins[protein]
