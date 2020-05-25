@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+	<head>		
+		<style>
+		
+		body {
+			background-color: #e6e6e6;
+		}
+		
+		body .site {
+			padding: 0 40px;
+			padding: 0 2.857142857rem;
+			background-color: #fff;
+			margin-top: 48px;
+			margin-top: 3.428571429rem;
+			margin-left: 18%;
+			margin-right: 18%;
+			margin-bottom: 48px;
+			margin-bottom: 3.428571429rem;
+			box-shadow: 0 2px 6px rgba(100,100,100,.3);
+			color: #5e5c51;
+		}
+		
+		.site {
+			padding: 0 24px;
+			padding: 0 1.714285714rem;
+			background-color: #fff;
+		}
+
+		.wf-active .site-header h1 {
+			font-family: "Noto Sans", sans-serif;
+			font-style: normal;
+			font-weight: 400;
+		}
+		
+		.wf-active .site-header h2 {
+			font-family: "Noto Sans",sans-serif;
+		}
+		
+		.entry-title {
+			font-style: normal;
+			font-weight: 400;
+		}
+		
+		.wp-block-image {
+			margin-bottom: 1em;
+		}
+		
+		
+		/* Style the tab */
+		.tab {
+			overflow: hidden;
+			border-top: 1px solid #ccc;
+			border-bottom: 1px solid #ccc;
+			background-color: #FFFFFF;
+		}
+		
+		/* Style the buttons inside the tab */
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 20px;
+		  color: #5e5c51;
+		}
+		
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+			color: black;
+		}
+		
+		/* Create an active/current tablink class */
+		.tab button.active {
+			font-weight: bold;
+		}
+		
+		/* Style the tab content */
+		.tabcontent {
+			display: none;
+			padding: 6px 12px;
+			border-top: none;
+			background-color: #FFFFFF;
+			color: #5e5c51;
+		}
+			
+		/* Fade tabs*/
+		.tabcontent {
+			animation: fadeEffect 1s; /* Fading effect takes 1 second */
+		}
+		/* Go from zero to full opacity */
+		@keyframes fadeEffect {
+			from {opacity: 0;}
+			to {opacity: 1;}
+		}
+		
+		.dropdown {
+		  float: left;
+		  overflow: hidden;
+		}
+
+		.dropdown .dropbtn {
+		  font-size: 20px;  
+		  border: none;
+		  outline: none;
+		  color: black;
+		  padding: 14px 16px;
+		  background-color: inherit;
+		  font-family: inherit;
+		  margin: 0;
+		}
+
+		.navbar a:hover, .dropdown:hover .dropbtn {
+		  background-color: #f1f1f1;
+		}
+
+		.dropdown-content {
+		  display: none;
+		  position: absolute;
+		  background-color: #f9f9f9;
+		  min-width: 160px;
+		  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		  z-index: 1;
+		}
+
+		.dropdown-content a {
+		  float: none;
+		  color: #f1f1f1;
+		  padding: 12px 16px;
+		  text-decoration: none;
+		  display: block;
+		  text-align: left;
+		}
+
+		.dropdown-content a:hover {
+		  background-color: #ddd;
+		}
+
+		.dropdown:hover .dropdown-content {
+		  display: block;
+		}
+		
+		.colophon{
+				display: table;
+				text-align: center;
+				margin-left: auto;
+				margin-right: auto;
+		}
+		
+		
+		</style>
+		<link rel="shortcut icon" href="www/favicon.ico">
+	</head>
+<body>
+	<div id="page" class="hfeed site">
+		<header id="masterhead" class="site-header" role="banner">
+			<hgroup>	
+				<h1 class="site-title">
+					<br>
+					<a style="text-decoration:none" color="inherit" href="http://giorgilab.dyndns.org/" title="GiorgiLab" rel="home">GiorgiLab</a>
+				</h1>
+				<h2 class="site-description">Computational Genetics &amp; Network Biology in Bologna</h2>
+			</hgroup>
+			<div class="tab">
+				<button class="tablinks" onclick="openCity(event, 'Home')" id="defaultOpen">Home</button>
+				<button class="tablinks" onclick="openCity(event, 'Projects')">Projects</button>
+				<button class="tablinks" onclick="openCity(event, 'SuiteTools')">Tools</button>
+				<button class="tablinks" onclick="openCity(event, 'Publications')">Publications</button>
+				<button class="tablinks" onclick="openCity(event, 'LabMembers')">Lab Members</button>
+				<button class="tablinks" onclick="openCity(event, 'LivBol')">Living in Bologna</button>
+				<button class="tablinks" onclick="openCity(event, 'Lessons')">Lessons</button>
+				<button class="tablinks" onclick="openCity(event, 'Links')">Links</button>
+				<button class="tablinks" onclick="openCity(event, 'Contact')">Contact</button> 
+			</div>
+		</header>
+	
+		<div id="Home" class="tabcontent">
+			<h1 class="entry-title">Welcome to GiorgiLab!</h1>
+			<p>The Giorgi Lab is located within the Department of Pharmacy and Biotechnology at the <br>
+				University of Bologna, Italy.</p>
+			<p></p>
+			<p>We aim to understand how <b> gene networks </b> work, in terms of transcriptional regulation and <br>
+				signal transduction. These networks are often exploited and rewired by <b> cancer cells </b> during <br>
+				the process of tumorigenesis.</p><br>
+			<img src=images/Homeimg1.png width="700" height="500"style="box-shadow: 0 2px 6px rgba(100,100,100,.3); color: #5e5c51;"><br>
+			<p>We use a computational approach with experimental validation. One of our approaches<br>
+				focuses on <b>single cell RNA-Seq</b> as a tool to investigate sample heterogeneity and network<br>
+				rearrangements during transient gene silencing and cell cycle phases:<br>
+			</p>
+			<img src=images/Homeimg2.png width="700" height="500" style="box-shadow: 0 2px 6px rgba(100,100,100,.3); color: #5e5c51;"><br>
+			<p>We teach applied Bioinformatics in the Genomics BSc course: <a href="http://tiny.cc/genomunibo">http://tiny.cc/genomunibo</a></p>
+			<p>We are <a href="https://giorgilab.org/postdoctoral-research-fellow-position/">looking for a motivated PostDoc</a>!<br>
+				
+			</p>
+		</div>
+			
+		<div id="Projects" class="tabcontent">
+			<h1 class="entry-title">Projects</h1>
+			<p>
+			Our topics:
+				<ol>
+					<li>Prediction of genomic alterations through gene expression and machine learning:<br>
+						<a href="https://www.frontiersin.org/articles/10.3389/fgene.2019.00671/full">https://www.frontiersin.org/articles/10.3389/fgene.2019.00671/full</a>
+					</li>
+					<li>The correlation tool, <a href="https://giorgilab.org/corto-the-correlation-tool/"><i>corto</i></a>, an R package for the inference of gene regulatory networks:<br>
+						<a href="https://cran.r-project.org/package=corto">https://cran.r-project.org/package=corto</a>
+					</li>
+					<li>Single Cell RNA-Seq to investigate tumor heterogeneity</li>
+					<li>Neuroblastoma research: the MYCN pathway members and how to turn them all down</li>
+				</ol>
+			</p>
+		</div>
+		
+		<div id="Publications" class="tabcontent">
+		  <h1 class="entry-title">Publications</h1>
+		  <p>
+			<i>Citation Metrics</i>: <br>
+			<a href=https://www.scopus.com/authid/detail.uri?authorId=35072718200>SCOPUS</a> (H-index: <b>18</b> – Citations: <b>1807</b>) <br>
+			<a href=https://orcid.org/0000-0002-7325-9908>ORCID</a> <br>
+			<a href=https://scholar.google.it/citations?user=0g0YNm4AAAAJ>Google Scholar</a> <br>
+		  </p>
+		</div>
+		
+		<div id="LabMembers" class="tabcontent">
+			<h1 class="entry-title">Lab Members</h1>
+			<p>
+				<img src=images/FedeSito.jpg style="width:200px">
+				<br>
+				<strong>Federico M. Giorgi, PhD</strong>
+				<br>
+				Assistant Professor of Bioinformatics
+				<br>	
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p>
+				<img src=images/DaniSito.jpg style="width:200px">
+				<br>
+				<strong>Daniele Mercatelli, PhD</strong>
+				<br>
+				Senior Postdoc
+				<br>
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p>
+				<img src=images/LucaSito.jpeg style="width:200px">
+				<br>
+				<strong>Luca Triboli, BSc</strong>
+				<br>
+				MSc Student
+				<br>
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p>
+				<img src=images/CarmineSito.jpg style="width:200px">
+				<br>
+				<strong>Carmine Ceraolo</strong>
+				<br>
+				BSc Student
+				<br>
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p>
+				<img src=images/ForestSito.jpg style="width:200px">
+				<br>
+				<strong>Forest Ray, PhD</strong>
+				<br>
+				Scientific Editor
+				<br>
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<figure class="wp-block-image">
+				<img src=images/3_1Sito.jpg style="width:60%;height:60%;">
+				<figcaption>From left to right: Daniele, Laura and Federico (May 2019)</figcaption>
+			</figure>
+			<figure>
+				<img src=images/3_2Sito.png style="width:60%;height:60%;">
+				<figcaption>From left to right: Luca, Laura and Federico (January 2019)</figcaption>
+			</figure class="wp-block-image">
+			<h3>Former Lab Members</h3>
+			<ul>
+				<li>Katia Ruggero, Visiting Postdoc (from the Aytes Lab).</li>
+				<li>Laura Scalambra, MSc Student. Graduated with 110/110 in December, 2019.</li>
+			</ul>
+			<h3>External Collaborators</h3>
+			<ul>
+				<li>Marek Mutwil, PhD, Professor, Nanyang University, Singapore</li>
+				<li>Beatrice Salvatori, PhD, Molecular Biologist, CNR, Italy</li>
+				<li>Denis Torre, Bioinformatician, Mount Sinai, USA</li>
+				<li>Francesco Licausi, PhD, Professor, University of Pisa, Italy</li>
+			</ul>
+		</div>
+		
+		<div id="LivBol" class="tabcontent">
+		  <h1 class="entry-title">Living Bologna</h1>
+		  <p>Infos about Bologna</p>
+		</div>
+		
+		<div id="Lessons" class="tabcontent">
+		  <h1 class="entry-title">Lessons</h1>
+		  <p>Here are the lessons created by Federico Giorgi</p>
+		</div>
+		
+		<div id="Links" class="tabcontent">
+		  <h1 class="entry-title">Links</h1>
+		  <p></p>
+		</div>
+		
+		<div id="Contact" class="tabcontent">
+		  <h1 class="entry-title">Contact</h1>
+		  <h2>Homepage of suite</h2>
+		</div>
+		
+		<div id="SuiteTools" class="tabcontent">
+			<p>
+				<a href="./Tucana/" ><img  src=images/TucanaHoPage.png width=275 height=150></a>
+				Tucana (TUmor Co-expression ANAlysis) is an online tool that provide real-time gene
+				correlation and co-expression analysis of healthy and tumoral tissues.
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p>
+				<a href="./KaMeR/" ><img src=images/KamerHoPage.png width=275 height=150></a>
+				KaMeR (Kaplan Meier R) is an online tool that provide real-time survival analysis
+				in 3 different ways: classical, step and combo.
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+			<p> 
+				<a href="https://cran.r-project.org/web/packages/corto/index.html" ><img src=images/CortoHomme.png width=275 height=150></a>		
+				Corto is still under development.
+			</p>
+			<hr class="wp-block-separator is-style-wide">
+		</div>
+
+		
+		
+		<footer id="colophon" role="contentinfo" align="center">
+			<div class="site-info">
+			   <p>Copyright (c) 2020 Luca Triboli All rights reserved</p>
+			   <h3><a href="https://giorgilab.org/">Giorgilab</a></h3>
+			   <br>
+			</div>
+		</footer>
+	</div>
+	
+	<script>
+			document.getElementById("defaultOpen").click();
+			
+			function openCity(evt, cityName) {
+			  var i, tabcontent, tablinks;
+			  tabcontent = document.getElementsByClassName("tabcontent");
+			  for (i = 0; i < tabcontent.length; i++) {
+				tabcontent[i].style.display = "none";
+			  }
+			  tablinks = document.getElementsByClassName("tablinks");
+			  for (i = 0; i < tablinks.length; i++) {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			  }
+			  document.getElementById(cityName).style.display = "block";
+			  evt.currentTarget.className += " active";
+			}
+	</script>
+</body>
+</html>
+
+
+

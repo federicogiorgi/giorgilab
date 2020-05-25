@@ -1,0 +1,16 @@
+.bottone {
+	transition-duration: 0.4s;
+	background-color: black;
+	color: white;
+	border: 2px solid #8f8686;
+	border-radius: 12px;
+}
+        
+.bottone:hover {
+	background-color: #262222;
+	color: white;
+}
+
+.corpo {
+    margin-left: 12px;
+}

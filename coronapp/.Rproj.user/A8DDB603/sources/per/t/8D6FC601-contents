@@ -1,0 +1,31 @@
+packages <- c("shiny","shinyjs")
+sapply(packages, function(x){suppressPackageStartupMessages(library)})
+library("shinythemes")
+
+refgenomes<-c("SARS-CoV-2 (NC_045512.2)"="NC_045512.2","Parvo B19 (NC_000883.2)"="NC_000883.2")
+
+
+fluidPage(theme= shinytheme("cosmo"),
+  titlePanel("Coronavirus FASTA annotator"),
+  sidebarPanel(
+    # Enter input fasta to annotate
+    fileInput("fasta","Choose FASTA File",
+              accept=c(".fasta",".fa",".fas","text/plain")
+    ),
+    # Select reference genome from list refgenomes
+    selectInput("refgenome","Select reference genome:",refgenomes,selected="NC_045512.2")
+  ),
+  mainPanel(
+    # Qua metti l'icona se ne hai una, va nella cartella www dove ho messo un'icona temporanea
+    # con il nome favicon.ico
+    tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
+    textOutput("nseq"),
+    textOutput("nevents"),
+    plotOutput("plot01"),
+    tableOutput("contents")
+  )
+  
+  # add_busy_bar(color = "red", height = "8px")
+  # https://cran.r-project.org/web/packages/shinybusy/vignettes/shinybusy-usage.html
+  # https://shiny.rstudio.com/articles/progress.html
+)

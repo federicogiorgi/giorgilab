@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588212165051.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3599954826",
+    "id" : "AEFA9949",
+    "lastKnownWriteTime" : 1589986245,
+    "last_content_update" : 1589986247063,
+    "path" : "//giorgilab.dyndns.org/shinyShare/coronapp/appunti.R",
+    "project_path" : "appunti.R",
+    "properties" : {
+        "cursorPosition" : "7,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

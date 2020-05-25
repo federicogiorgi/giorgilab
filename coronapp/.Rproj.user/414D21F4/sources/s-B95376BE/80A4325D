@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588297217275.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "80A4325D",
+    "lastKnownWriteTime" : 1587763144,
+    "last_content_update" : 1587763144,
+    "path" : "D:/Dropbox/projects/coronaseq/code/010_gisaid_annot_snp.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "327,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

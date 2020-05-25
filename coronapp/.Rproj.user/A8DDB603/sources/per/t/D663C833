@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588151605928.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3946670219",
+    "id" : "D663C833",
+    "lastKnownWriteTime" : 1587390599,
+    "last_content_update" : 1587390599,
+    "path" : "//giorgilab.dyndns.org/shinyShare/Tucana/server.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "81,45",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
