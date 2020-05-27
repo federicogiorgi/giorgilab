@@ -14,7 +14,7 @@ If you use this tool, please cite our article: *publication when ready*
 
 ## Usage
 
-To use our apps, please go to the address *giorgilab.dyndns.org*
+To use our apps, please go to the address [GiorgiLab](giorgilab.dyndns.org)
 
 ## Licensing
 
