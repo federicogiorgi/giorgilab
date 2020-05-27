@@ -1,6 +1,7 @@
-packages <- c("Biostrings","seqinr","shiny","stringi","data.table","googleVis")
+packages <- c("Biostrings","seqinr","shiny","stringi","data.table","googleVis","corto")
 sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
 source("annotator.R")
+
 
 
 
@@ -26,9 +27,6 @@ function(input, output) {
   load("data/metadata.rda") # Sample metadata
   load("data/results.rda") # Annotated mutations
   load("data/headers.rda") # All sequences tested (including those without mutations)
-  
-  
-  
   
   # Show/hide blocks
   shinyjs::hideElement("userfasta",anim = TRUE,animType = "slide")
@@ -121,27 +119,37 @@ function(input, output) {
     occ<-c(zeroes,occ)
     names(occ)[1]<-"0"
     par(las=2,mar=c(5,5,5,1))
-    barplot(occ,xlab="nr of mutations",main="Overall mutations per sample",col="cornflowerblue")
+    barplot(occ,xlab="nr of mutations",main="Overall mutations per sample",col="cornflowerblue",ylab="nr of samples",yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Variant classes
-    occ<-sort(table(toshow$varclass),dec=TRUE)
+    occ<-sort(table(toshow$varclass),dec=TRUE)[1:6]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of events",main="Most frequent events per class",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of events",main="Most frequent events per class",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Variant class (A/T, etc)
     occ<-sort(table(apply(toshow[,c("refvar","qvar")],1,paste0,collapse=">")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events per type",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events per type",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Nucleotide events
     occ<-sort(table(apply(toshow[,c("refvar","refpos","qvar")],1,paste0,collapse="")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events (nucleotide)",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events (nucleotide)",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Protein events
     occ<-sort(table(apply(toshow[,c("protein","variant")],1,paste0,collapse=":")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events (protein)",col=terrain.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events (protein)",col=terrain.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
   }
   
   ### Rendering blocks ----
@@ -191,6 +199,9 @@ function(input, output) {
 
   output$country<-renderText({
     paste0("Showing results for ",input$country)
+  })
+  output$mcountry<-renderText({
+    paste0("Mutational overview for ",input$country)
   })
   
   
@@ -264,7 +275,7 @@ function(input, output) {
                    choices=as.list(names(niceproteins)),
                    selected="S")
   })
-  output$uicountries<-renderUI({
+  output$wwuicountries<-renderUI({
     selectizeInput("country","Select Country: ",
                    choices=as.list(unique(c("World",sort(metadata$country)))),
                    selected="World")
@@ -272,7 +283,7 @@ function(input, output) {
   
   
   ### Visualize mutations over protein length
-  output$googlevis <- renderGvis({
+  output$googlevis <- googleVis::renderGvis({
     ### Parameters
     protein<-input$uiprotein
     log10<-input$uilog10
@@ -323,7 +334,7 @@ function(input, output) {
     )
   })
   
-  output$wwgooglevis <- renderGvis({
+  output$wwgooglevis<-renderGvis({
     ### Parameters
     protein<-input$protein
     log10<-input$wwlog10
@@ -380,6 +391,46 @@ function(input, output) {
                     )
     )
   })
+  # Time stuff
+  output$timecountries<-renderUI({
+    selectizeInput("timecountry","Select Country: ",
+                   choices=as.list(unique(c("World",sort(metadata$country)))),
+                   selected="World")
+  })
+  
+  output$timemuts<-renderUI({
+    country<-input$timecountry
+    if(is.null(country)){country<-"World"}
+    load(paste0("data/times/times-",country,".rda"))
+    selectizeInput("timemut","Select Mutation: ",
+                   choices=as.list(rownames(times)),
+                   selected="S:D614G")
+  })
+  
+  output$timeplot<-renderPlot({
+    country<-input$timecountry
+    mut<-input$timemut
+    if(is.null(country)){country<-"World"}
+    load(paste0("data/times/times-",country,".rda"))
+    
+    # Start plotting
+    par(las=2,mar=c(8,5,5,1),mfrow=c(1,2))
+    
+    # Nr of mut
+    track<-times[mut,]
+    par(cex=1.3)
+    plot(track,xaxt="n",xlab="",ylab="nr of mutations detected",main=paste0(mut," abundance in ",country),pch=20)
+    axis(1,at=1:length(track),labels=names(track))
+    grid()
+    
+    # Percentage of mut
+    mutsum<-apply(times,2,sum)
+    perctrack<-track/mutsum*100
+    plot(perctrack,xaxt="n",xlab="",ylab="% of all mutations sequenced",main=paste0(mut," frequency in ",country),pch=20)
+    axis(1,at=1:length(perctrack),labels=names(perctrack))
+    grid()
+  })
+  
   
 }
 

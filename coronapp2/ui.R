@@ -72,71 +72,83 @@ shinyUI(
                  ".shiny-output-error:before { visibility: hidden; }"
       ),
       shinyjs::hidden(
-        wellPanel(id="userfasta",
-                  textOutput("nseq"),
-                  textOutput("nloci"),
-                  textOutput("nevents"),
-                  plotOutput("plot01",click="plot_click",width="95%",height="700px"),
-                  hr(),
-                  fluidRow(
-                    downloadButton(outputId="downloadCSV",
-                                   label="Download Full table (CSV format)",class="bbutton")
-                  ),
-                  br(),
-                  fluidRow(
-                    DT::dataTableOutput("contents")
-                  ),
-                  hr(),
-                  fluidRow(
-                    column(2,
-                           uiOutput("uiproteins")
-                    ),
-                    column(2,
-                           checkboxInput("uilog10", "Log10", FALSE),
-                           checkboxInput("uipercentage", "Percentage", FALSE)
-                    )
-                  ),
-                  fluidRow(
-                    htmlOutput("googlevis")
-                  )
-                  
+        wellPanel(
+          id="userfasta",
+          textOutput("nseq"),
+          textOutput("nloci"),
+          textOutput("nevents"),
+          plotOutput("plot01",click="plot_click",width="95%",height="700px"),
+          hr(),
+          fluidRow(
+            downloadButton(outputId="downloadCSV",
+                           label="Download Full table (CSV format)",class="bbutton")
+          ),
+          br(),
+          fluidRow(
+            DT::dataTableOutput("contents")
+          ),
+          hr(),
+          fluidRow(
+            column(2,
+                   uiOutput("uiproteins")
+            ),
+            column(2,
+                   checkboxInput("uilog10", "Log10", FALSE),
+                   checkboxInput("uipercentage", "Percentage", FALSE)
+            )
+          ),
+          fluidRow(
+            htmlOutput("googlevis")
+          )
+          
         )
       ),
       
-      wellPanel(id="worldwide",
-                h1("Current Status of SARS-CoV-2 mutational data"),
-                h5("updated May 25, 2020"),
-                textOutput("wwnseq"),
-                textOutput("wwnloci"),
-                textOutput("wwnevents"),
-                fluidRow(
-                  column(2,
-                         uiOutput("uicountries")
-                  ),
-                  column(2,
-                         uiOutput("wwuiproteins")
-                  ),
-                  column(2,
-                         checkboxInput("wwlog10", "Log10", TRUE),
-                         checkboxInput("wwpercentage", "Percentage", FALSE)
-                  )
-                ),
-                fluidRow(
-                  htmlOutput("wwgooglevis")
-                ),
-                hr(),
-                h3(textOutput("country")),
-                fluidRow(
-                  downloadButton(outputId="wwdownloadCSV",
-                                 label="Download Full table (CSV format)",class="bbutton")
-                ),
-                br(),
-                fluidRow(
-                  DT::dataTableOutput("wwcontents")
-                ),
-                hr(),
-                plotOutput("wwplot01",click="plot_click",width="95%",height="700px")
-                
+      wellPanel(
+        id="worldwide",
+        h1("Current Status of SARS-CoV-2 mutational data"),
+        h5("updated May 25, 2020"),
+        textOutput("wwnseq"),
+        textOutput("wwnloci"),
+        textOutput("wwnevents"),
+        fluidRow(
+          column(2,
+                 uiOutput("wwuicountries")
+          ),
+          column(2,
+                 uiOutput("wwuiproteins")
+          ),
+          column(2,
+                 checkboxInput("wwlog10", "Log10", TRUE),
+                 checkboxInput("wwpercentage", "Percentage", FALSE)
+          )
+        ),
+        fluidRow(
+          htmlOutput("wwgooglevis")
+        ),
+        hr(),
+        h3(textOutput("country")),
+        fluidRow(
+          downloadButton(outputId="wwdownloadCSV",
+                         label="Download Full table (CSV format)",class="bbutton")
+        ),
+        br(),
+        fluidRow(
+          DT::dataTableOutput("wwcontents")
+        ),
+        h3(textOutput("mcountry")),
+        plotOutput("wwplot01",click="plot_click",width="95%",height="700px"),
+        hr(),
+        h2("Analysis of mutations over time"),
+        fluidRow(
+          column(2,
+                 uiOutput("timecountries")
+          ),
+          column(2,
+                 uiOutput("timemuts")
+          )
+        ),
+        plotOutput("timeplot",width="95%",height="700px")
       ),
       
       
