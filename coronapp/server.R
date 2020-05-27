@@ -424,9 +424,8 @@ function(input, output) {
     grid()
     
     # Percentage of mut
-    mutsum<-apply(times,2,sum)
-    perctrack<-track/mutsum*100
-    plot(perctrack,xaxt="n",xlab="",ylab="% of all mutations sequenced",main=paste0(mut," frequency in ",country),pch=20)
+    perctrack<-track/times["nrsamples",]*100
+    plot(perctrack,xaxt="n",xlab="",ylab="% of samples sequenced",main=paste0(mut," frequency in ",country),pch=20)
     axis(1,at=1:length(perctrack),labels=names(perctrack))
     grid()
   })
