@@ -1,9 +1,0 @@
-{
-    "path" : "//giorgilab.dyndns.org/shinyShare/coronApp",
-    "sortOrder" : [
-        {
-            "ascending" : true,
-            "columnIndex" : 2
-        }
-    ]
-}

@@ -1,28 +1,53 @@
-packages <- c("Biostrings","seqinr","shiny","stringi","data.table")
+packages <- c("Biostrings","seqinr","shiny","stringi","data.table","googleVis","corto")
 sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
+source("annotator.R")
+
+
+
 
 function(input, output) {
   message(paste0("Server started at ",Sys.time()))
+  options(shiny.maxRequestSize=200*1024^2) # Upload limit to 200MB
   
   # Random string for temp files
   rand<-stringi::stri_rand_strings(1,20)
   
-  # Global variable for results
+  # Global variable declaration
   results<-c()
-  
+  headers<-c()
+
   # Reference genome TODO: input by user
-  ref<-"data/NC_045512.2.fa"
-  gff3<-"data/NC_045512.2_annot.gff3"
+  genomefasta<-"data/NC_045512.2.fa"
+  genomegff3<-"data/NC_045512.2_annot.gff3"
+  gff3<-read.delim(genomegff3,as.is=TRUE,skip=2,header=FALSE)
+  niceproteins<-setNames(gff3[,10],gff3[,9])
+  
+  
+  ### Current data
+  load("data/metadata.rda") # Sample metadata
+  load("data/results.rda") # Annotated mutations
+  load("data/headers.rda") # All sequences tested (including those without mutations)
   
   # Show/hide blocks
-  shinyjs::hideElement("panDow",anim = TRUE,animType = "slide")
+  shinyjs::hideElement("userfasta",anim = TRUE,animType = "slide")
   observeEvent(input$fasta,{
     if(is.null(input$fasta)){
-      shinyjs::hideElement("panDow",anim = TRUE,animType = "slide")
+      shinyjs::hideElement("userfasta",anim = TRUE,animType = "slide")
     }else{
-      shinyjs::showElement("panDow",anim = TRUE,animType = "slide")
+      shinyjs::showElement("userfasta",anim = TRUE,animType = "slide")
     }
   })
+  
+  shinyjs::showElement("worldwide",anim = TRUE,animType = "slide")
+  observeEvent(input$fasta,{
+    if(is.null(input$fasta)){
+      shinyjs::showElement("worldwide",anim = TRUE,animType = "slide")
+    }else{
+      shinyjs::hideElement("worldwide",anim = TRUE,animType = "slide")
+    }
+  })
+  
+  
   
   ### Functions ----
   # Function for UNIX preprocessing
@@ -37,10 +62,14 @@ function(input, output) {
     nucmer.delta<-paste0("tmp/nuc_",rand,".delta")
     nucmer.coords<-paste0("tmp/nuc_",rand,".coords")
     nucmer.snps<-paste0("tmp/nuc_",rand,".snps")
+    nucmer.headers<-paste0("tmp/nuc_",rand,".headers")
+    system(paste0('grep ">" ',path,' | sed "s/>//" > ',nucmer.headers))
     system(paste0("dos2unix ",path))
-    system(paste0("nucmer --forward -p ",prefix," ",ref," ",path))
+    system(paste0("nucmer --forward -p ",prefix," ",genomefasta," ",path))
     system(paste0("show-coords -r -c -l ",nucmer.delta," > ",nucmer.coords))
     system(paste0("show-snps ",nucmer.delta," -T -l > ",nucmer.snps))
+    headers<<-read.delim(nucmer.headers,as.is=TRUE,header=FALSE)[,1]
+    
     #message(getwd())
     #message(system("ls tmp"))
     system(paste0("rm ",nucmer.coords," ",nucmer.delta))
@@ -54,300 +83,73 @@ function(input, output) {
   
   # R part: annotation
   r01<-function(){
-    ### Load variant list ----
-    nucmer.snps<-paste0("tmp/nuc_",rand,".snps")
-    #message(nucmer.snps)
-    nucmer<-read.delim(nucmer.snps,as.is=TRUE,skip=4,header=FALSE)
-    colnames(nucmer)<-c("rpos","rvar","qvar","qpos","","","","","rlength","qlength","","","rname","qname")
-    rownames(nucmer)<-paste0("var",1:nrow(nucmer))
-    # Fix IUPAC codes
-    table(nucmer$qvar)
-    nucmer<-nucmer[!nucmer$qvar%in%c("B","D","H","K","M","N","R","S","V","W","Y"),]
-    nrow(nucmer)
-    
-    ### Aminoacid variant list ----
-    # Load reference sequence
-    refseq<-seqinr::read.fasta(ref,forceDNAtolower=FALSE)[[1]]
-    
-    # Load GFF3
-    gff3<-read.delim(gff3,as.is=TRUE,skip=2,header=FALSE)
-    message(length(colnames(gff3)))
-    annot<-setNames(gff3[,10],gff3[,9])
-    
-    ### Merge neighboring events ----
-    samples<-unique(nucmer$qname)
-    length(samples) # 9884
-    pb<-txtProgressBar(0,length(samples),style=3)
-    for (pbi in 1:length(samples)){ # This will update the nucmer object
-      sample<-samples[pbi]
-      allvars<-nucmer[nucmer$qname==sample,]
-      snps<-allvars[(allvars[,"rvar"]!=".")&(allvars[,"qvar"]!="."),]
-      inss<-allvars[(allvars[,"rvar"]=="."),]
-      dels<-allvars[(allvars[,"qvar"]=="."),]
-      # Merge insertions
-      prevqpos<-0
-      prevrowname<-NULL
-      remove<-c()
-      i<-1
-      corrector<-0
-      while(i<=nrow(inss)){
-        rpos<-inss[i,"rpos"]
-        rvar<-inss[i,"rvar"]
-        qvar<-inss[i,"qvar"]
-        qpos<-inss[i,"qpos"]
-        if((qpos!=1)&(qpos==(prevqpos+1+corrector))){
-          inss<-inss[-i,]
-          inss[prevrowname,"qvar"]<-paste0(inss[prevrowname,"qvar"],qvar)
-          corrector<-corrector+1
-          i<-i-1
-        } else {
-          corrector<-0
-          prevrowname<-rownames(inss)[i]
-          prevqpos<-qpos
-        }
-        i<-i+1
-      }
-      # Merge deletions
-      prevqpos<-0
-      prevrowname<-NULL
-      remove<-c()
-      i<-1
-      while(i<=nrow(dels)){
-        rpos<-dels[i,"rpos"]
-        rvar<-dels[i,"rvar"]
-        qvar<-dels[i,"qvar"]
-        qpos<-dels[i,"qpos"]
-        
-        if((qpos!=1)&(qpos==(prevqpos))){
-          dels<-dels[-i,]
-          dels[prevrowname,"rvar"]<-paste0(dels[prevrowname,"rvar"],rvar)
-          i<-i-1
-        } else {
-          prevrowname<-rownames(dels)[i]
-          prevqpos<-qpos
-        }
-        i<-i+1
-      }
-      # Merge SNPs
-      prevqpos<-0
-      prevrowname<-NULL
-      remove<-c()
-      i<-1
-      corrector<-0
-      while(i<=nrow(snps)){
-        rpos<-snps[i,"rpos"]
-        rvar<-snps[i,"rvar"]
-        qvar<-snps[i,"qvar"]
-        qpos<-snps[i,"qpos"]
-        
-        if((qpos!=1)&(qpos==(prevqpos+1+corrector))){
-          snps<-snps[-i,]
-          snps[prevrowname,"rvar"]<-paste0(snps[prevrowname,"rvar"],rvar)
-          snps[prevrowname,"qvar"]<-paste0(snps[prevrowname,"qvar"],qvar)
-          corrector<-corrector+1
-          i<-i-1
-        } else {
-          corrector<-0
-          prevrowname<-rownames(snps)[i]
-          prevqpos<-qpos
-        }
-        i<-i+1
-      }
-      
-      # Remerge back
-      allvars2<-rbind(snps,inss,dels)
-      remove<-setdiff(rownames(allvars),rownames(allvars2))
-      nucmer<-nucmer[setdiff(rownames(nucmer),remove),]
-      nucmer[rownames(allvars2),]<-allvars2
-      setTxtProgressBar(pb,pbi)
-    }
-    
-    ### Provide effect of each SNP and indel ----
-    header<-c("sample","refpos","refvar","qvar","qpos","qlength","protein","variant","varclass","annotation")
-    results<-matrix(NA,ncol=length(header),nrow=0)
-    colnames(results)<-header
-    samples<-unique(nucmer$qname)
-    pb<-txtProgressBar(0,length(samples),style=3)
-    for (pbi in 1:length(samples)){ # This will update the nucmer object
-      sample<-samples[pbi]
-      allvars<-nucmer[nucmer$qname==sample,]
-      # Check changes in query protein sequence according to variants
-      for(i in 1:nrow(allvars)){ # Assuming they are sorted numerically
-        nucline<-allvars[i,]
-        rpos<-nucline[1,"rpos"]
-        rvar<-nucline[1,"rvar"]
-        qvar<-nucline[1,"qvar"]
-        qpos<-nucline[1,"qpos"]
-        qlength<-nucline[1,"qlength"]
-        
-        # Match over GFF3 annotation
-        a<-rpos-gff3[,4]
-        b<-rpos-gff3[,5]
-        signs<-sign(a)*sign(b)
-        w<-which(signs==-1)
-        
-        # Outside genes scenarios
-        if(length(w)==0){
-          if(rpos<gff3[1,4]){
-            protein<-"5'UTR";output<-c(rpos,"extragenic")
-          } else if(rpos>gff3[1,5]){
-            protein<-"3'UTR";output<-c(rpos,"extragenic")
-          } else {
-            protein<-"intergenic";output<-c(rpos,"extragenic")
-          }
-          
-        } else{ # Inside genes scenario
-          start<-gff3[w,4]
-          end<-gff3[w,5]
-          protein<-gff3[w,9]
-          refdnaseq<-Biostrings::DNAString(paste0(refseq[start:end],collapse=""))
-          refpepseq<-Biostrings::translate(refdnaseq)
-          refpepseq<-strsplit(as.character(refpepseq),"")[[1]]
-          if(qvar=="."){ # Deletion scenario
-            if((nchar(rvar)%%3)!=0){ # Deletion frameshift scenario
-              mutpos<-round((rpos-start+1)/3)
-              output<-c(paste0(refpepseq[mutpos],mutpos),"deletion_frameshift")
-            } else { # In-frame deletion
-              varseq<-refseq
-              varseq<-varseq[-(rpos:(rpos+nchar(rvar)-1))]
-              varseq<-varseq[start:(end-nchar(rvar))]
-              vardnaseq<-DNAString(paste0(varseq,collapse=""))
-              varpepseq<-Biostrings::translate(vardnaseq)
-              varpepseq<-strsplit(as.character(varpepseq),"")[[1]]
-              
-              for(j in 1:length(refpepseq)){
-                refj<-refpepseq[j]
-                varj<-varpepseq[j]
-                if(refj!=varj){
-                  if(varj=="*"){
-                    output<-c(paste0(refj,j),"deletion_stop")
-                  } else {
-                    output<-c(paste0(refj,j),"deletion")
-                  }
-                  break()
-                }
-              }
-            }
-          } else if(rvar=="."){ # Insertion scenario
-            if((nchar(qvar)%%3)!=0){ # Insertion frameshift scenario
-              mutpos<-round((rpos-start+1)/3)
-              output<-c(paste0(refpepseq[mutpos],mutpos),"insertion_frameshift")
-            } else { # In-frame insertion
-              varseq<-c(refseq[1:rpos],strsplit(qvar,"")[[1]],refseq[(rpos+1):length(refseq)])
-              varseq<-varseq[start:(end+nchar(qvar))]
-              vardnaseq<-Biostrings::DNAString(paste0(varseq,collapse=""))
-              varpepseq<-Biostrings::translate(vardnaseq)
-              varpepseq<-strsplit(as.character(varpepseq),"")[[1]]
-              
-              for(j in 1:length(refpepseq)){
-                refj<-refpepseq[j]
-                varj<-varpepseq[j]
-                if(refj!=varj){
-                  nr_aa_inserted<-nchar(qvar)/3
-                  multivarj<-varpepseq[j:(j+nr_aa_inserted-1)]
-                  if(any(multivarj=="*")){
-                    multivarj<-paste0(multivarj,collapse="")
-                    output<-c(paste0(multivarj,j),"insertion_stop")
-                  } else{
-                    multivarj<-paste0(multivarj,collapse="")
-                    output<-c(paste0(multivarj,j),"insertion")
-                  }
-                  break()
-                }
-              }
-            }
-          } else { # SNP scenario
-            if(nchar(qvar)==1){ # Single nucleotide scenario
-              varseq<-refseq
-              varseq[rpos]<-qvar
-              varseq<-varseq[start:end]
-              vardnaseq<-Biostrings::DNAString(paste0(varseq,collapse=""))
-              varpepseq<-Biostrings::translate(vardnaseq)
-              varpepseq<-strsplit(as.character(varpepseq),"")[[1]]
-              mutpos<-which(varpepseq!=refpepseq)
-              if(length(mutpos)==0){ # Silent SNP scenario
-                mutpos<-round((rpos-start+1)/3)
-                refaa<-refpepseq[mutpos]
-                varaa<-varpepseq[mutpos]
-                output<-c(paste0(refaa,mutpos,varaa),"SNP_silent")
-              } else { # Changed aa scenario
-                refaa<-refpepseq[mutpos]
-                varaa<-varpepseq[mutpos]
-                if(varaa=="*"){
-                  output<-c(paste0(refaa,mutpos,varaa),"SNP_stop")
-                } else {
-                  output<-c(paste0(refaa,mutpos,varaa),"SNP")
-                }
-              }
-            } else { # Multiple neighboring nucleotides
-              varlength<-nchar(qvar)
-              varseq<-refseq
-              varseq[rpos:(rpos+varlength-1)]<-strsplit(qvar,"")[[1]]
-              varseq<-varseq[start:end]
-              vardnaseq<-Biostrings::DNAString(paste0(varseq,collapse=""))
-              varpepseq<-Biostrings::translate(vardnaseq)
-              varpepseq<-strsplit(as.character(varpepseq),"")[[1]]
-              mutpos<-which(varpepseq!=refpepseq)
-              if(length(mutpos)==0){ # Silent SNP scenario
-                mutpos<-round((rpos-start+1)/3)
-                refaa<-refpepseq[mutpos]
-                varaa<-varpepseq[mutpos]
-                output<-c(paste0(refaa,mutpos,varaa),"SNP_silent")
-              } else { # Changed aa scenario
-                refaa<-paste0(refpepseq[mutpos],collapse="")
-                varaa<-paste0(varpepseq[mutpos],collapse="")
-                if(any(varaa=="*")){
-                  output<-c(paste0(refaa,mutpos[1],varaa),"SNP_stop")
-                } else {
-                  output<-c(paste0(refaa,mutpos[1],varaa),"SNP")
-                }
-              }
-            }
-          }
-        }
-        results<-rbind(results,c(sample,rpos,rvar,qvar,qpos,qlength,protein,output,annot[protein]))
-      }
-      setTxtProgressBar(pb,pbi)
-    }
-    results<<-as.data.frame(results)
-    # save(results,file=paste0("tmp/results_",rand,",rda"))
-    unlink(nucmer.snps)
+    nucmerfile<-paste0("tmp/nuc_",rand,".snps")
+    results<-annotator(nucmerfile,genomefasta,genomegff3)
+    unlink(nucmerfile)
+    #save(results,file="tmp/myresults.rda")
+    results<<-results
     return(paste0("Number of mutations in the input (after merging neighboring loci): ",nrow(results)))
   }
   
   # R part: plotting
   r02<-function(){
-    par(mfrow=c(2,3))
+    subheaders<-headers
+    country<-input$country
+    if(is.null(country)){country<-"World"}
+    countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
+    toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
+    colnames(toshow)[1:2]<-c("sample","country")
+    if(country!="World"){
+      toshow<-toshow[toshow$country==country,]
+      subheaders<-names(countries)[countries[headers]==country]
+      toshow<-toshow[!is.na(toshow$sample),]
+      toshow$sample<-as.character(toshow$sample)
+    }
+    
+    par(mfrow=c(2,3),cex=1.2)
     
     # Most mutated samples
-    occ<-sort(table(results$sample),dec=TRUE)[1:10]
+    occ<-sort(table(toshow$sample),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
     barplot(occ,ylab="nr of mutations",main="Most mutated samples",col=heat.colors(length(occ)))
     
     # Mutations per sample
-    occ<-table(table(results$sample))
+    occ<-table(table(toshow$sample))
+    zeroes<-length(setdiff(subheaders,unique(toshow$sample)))
+    occ<-c(zeroes,occ)
+    names(occ)[1]<-"0"
     par(las=2,mar=c(5,5,5,1))
-    barplot(occ,xlab="nr of mutations",main="Overall mutations per sample",col="cornflowerblue")
+    barplot(occ,xlab="nr of mutations",main="Overall mutations per sample",col="cornflowerblue",ylab="nr of samples",yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Variant classes
-    occ<-sort(table(results$varclass),dec=TRUE)
+    occ<-sort(table(toshow$varclass),dec=TRUE)[1:6]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of events",main="Most frequent events per class",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of events",main="Most frequent events per class",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Variant class (A/T, etc)
-    occ<-sort(table(apply(results[,c("refvar","qvar")],1,paste0,collapse=">")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("refvar","qvar")],1,paste0,collapse=">")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events per type",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events per type",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Nucleotide events
-    occ<-sort(table(apply(results[,c("refvar","refpos","qvar")],1,paste0,collapse="")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("refvar","refpos","qvar")],1,paste0,collapse="")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events (nucleotide)",col=heat.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events (nucleotide)",col=heat.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
     
     # Protein events
-    occ<-sort(table(apply(results[,c("protein","variant")],1,paste0,collapse=":")),dec=TRUE)[1:10]
+    occ<-sort(table(apply(toshow[,c("protein","variant")],1,paste0,collapse=":")),dec=TRUE)[1:10]
     par(las=2,mar=c(8,5,5,1))
-    barplot(occ,ylab="nr of samples",main="Most frequent events (protein)",col=terrain.colors(length(occ)))
+    barplot(occ,ylab="nr of samples",main="Most frequent events (protein)",col=terrain.colors(length(occ)),yaxt="n")
+    kmg<-kmgformat(pretty(occ))
+    axis(2,at=pretty(occ),labels=kmg)
   }
   
   ### Rendering blocks ----
@@ -375,27 +177,260 @@ function(input, output) {
   })
   
   output$plot01<-renderPlot({
-    # Input file with name, size, type, datapath
     if (!(is.null(input$fasta))){
-      r02() # basic plotting
+      r02()
     }
   })
   
+  output$wwplot01<-renderPlot({
+    r02()
+  })
+  
+  
+  output$wwnseq<-renderText({
+    paste0("Number of samples: ",length(headers))
+  })
+  output$wwnloci<-renderText({
+    paste0("Number of distinct mutated loci: ",length(unique(results$variant)))
+  })
+  output$wwnevents<-renderText({
+    paste0("Total number of mutational events: ",nrow(results))
+  })
+
+  output$country<-renderText({
+    paste0("Showing results for ",input$country)
+  })
+  output$mcountry<-renderText({
+    paste0("Mutational overview for ",input$country)
+  })
+  
+  
   output$contents <- renderDataTable({
-    # Input file with name, size, type, datapath
     if (!(is.null(input$fasta))){
-      results
+      return(results)
     }
   })
+  
+  output$wwcontents <- renderDataTable({
+    country<-input$country
+    if(is.null(country)){country<-"World"}
+    countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
+    toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
+    colnames(toshow)[1:2]<-c("sample","country")
+    if(country!="World"){
+      toshow<-toshow[toshow$country==country,]
+      toshow<-toshow[!is.na(toshow$sample),]
+      toshow$sample<-as.character(toshow$sample)
+    }
+    return(toshow)
+  })
+  
   
   output$downloadCSV <- downloadHandler(
     filename = function() {
-      paste("results.csv", sep = "")
+      "myresults.csv"
     },
     content = function(file) {
       write.csv(results, file, row.names = FALSE)
     }
   )
+  
+  output$wwdownloadCSV<-downloadHandler(
+    filename=function(){
+      country<-input$country
+      if(is.null(country)){country<-"World"}
+      if(country=="World"){
+        paste0("results_",country,".csv")
+      } else {
+        return("results.csv")
+      }
+    },
+    content=function(file){
+      country<-input$country
+      if(is.null(country)){country<-"World"}
+      countries<-setNames(metadata$country,metadata$gisaid_epi_isl)
+      toshow<-cbind(results[,1],countries[results$sample],results[,2:ncol(results)])
+      colnames(toshow)[1:2]<-c("sample","country")
+      if(country!="World"){
+        toshow<-toshow[toshow$country==country,]
+        toshow<-toshow[!is.na(toshow$sample),]
+        toshow$sample<-as.character(toshow$sample)
+        write.csv(toshow, file, row.names = FALSE)
+      } else {
+        file.copy("data/results.csv",file)
+      }
+    }
+  )
+
+
+  
+  ### Lists for selects
+  output$uiproteins<-renderUI({
+    selectizeInput("uiprotein","Select Protein: ",
+                   choices=as.list(names(niceproteins)),
+                   selected="S")
+  })
+  output$wwuiproteins<-renderUI({
+    selectizeInput("protein","Select Protein: ",
+                   choices=as.list(names(niceproteins)),
+                   selected="S")
+  })
+  output$wwuicountries<-renderUI({
+    selectizeInput("country","Select Country: ",
+                   choices=as.list(unique(c("World",sort(metadata$country)))),
+                   selected="World")
+  })
+  
+  
+  ### Visualize mutations over protein length
+  output$googlevis <- googleVis::renderGvis({
+    ### Parameters
+    protein<-input$uiprotein
+    log10<-input$uilog10
+    percentage<-input$uipercentage
+    
+    ### Process parameters
+    # Select Protein
+    niceprotein<-niceproteins[protein]
+    tomap<-results[results$protein==protein,]
+    csamples<-headers
+    # Further processing
+    occ<-table(tomap$variant)
+    labs<-names(occ)
+    occ<-as.numeric(occ)
+    occloc<-gsub("\\D|\\*","",labs)
+    coords<-as.numeric(gff3[gff3[,9]==protein,4:5])
+    plen<-(coords[2]-coords[1]+1)/3
+    ylab<-"Occurrence of event"
+    maxValue<-max(occ)+1
+    if(log10){
+      occ<-log10(occ+0.1)
+      maxValue<-max(occ)+1
+      ylab<-"Occurrence of event (Log10)"
+    }else if(percentage){
+      occ<-as.numeric(round(100*occ/length(csamples),3))
+      ylab<-"Occurrence of event (%)"
+      maxValue<-100
+    }
+    
+    # Set up object for plot
+    df<-data.frame(
+      aa=occloc,
+      occurrence=occ,
+      effect=labs,
+      stringsAsFactors=FALSE
+    )
+    
+    # Google vis
+    gvisBubbleChart(df,idvar="effect",xvar="aa",yvar="occurrence",
+                    options=list(
+                      title=paste0("Mutation frequency for protein ",protein," (",niceprotein,") in user-provided dataset"),
+                      hAxis=paste0('{viewWindowMode: "maximized", title: "aa coordinate", minValue:0, maxValue: ',plen,'}'),
+                      vAxis=paste0('{viewWindowMode: "maximized", title: "',ylab,'", minValue:0, maxValue: ',maxValue,'}')   ,
+                      bubble='{textStyle: {fontSize: 11, color: "black", bold: true}}',
+                      sizeAxis='{maxSize: 5, maxValue: 100}',
+                      height=600
+                    )
+    )
+  })
+  
+  output$wwgooglevis<-renderGvis({
+    ### Parameters
+    protein<-input$protein
+    log10<-input$wwlog10
+    percentage<-input$wwpercentage
+    country<-input$country
+    if(is.null(country)){country<-"World"}
+
+    ### Process parameters
+    # Select Protein
+    niceprotein<-niceproteins[protein]
+    tomap<-results[results$protein==protein,]
+    # Select Country
+    csamples<-union(headers,metadata$gisaid_epi_isl)
+    if(country!="World"){
+      csamples<-metadata$gisaid_epi_isl[metadata$country==country]
+      tomap<-tomap[tomap$sample%in%csamples,]
+    }
+    # Further processing
+    occ<-table(tomap$variant)
+    labs<-names(occ)
+    occ<-as.numeric(occ)
+    occloc<-gsub("\\D|\\*","",labs)
+    coords<-as.numeric(gff3[gff3[,9]==protein,4:5])
+    plen<-(coords[2]-coords[1]+1)/3
+    ylab<-"Occurrence of event"
+    maxValue<-max(occ)+1
+    if(log10){
+      occ<-log10(occ+0.1)
+      maxValue<-max(occ)+1
+      ylab<-"Occurrence of event (Log10)"
+    }else if(percentage){
+      occ<-as.numeric(round(100*occ/length(csamples),3))
+      ylab<-"Occurrence of event (%)"
+      maxValue<-100
+    }
+    
+    # Set up object for plot
+    df<-data.frame(
+      aa=occloc,
+      occurrence=occ,
+      effect=labs,
+      stringsAsFactors=FALSE
+    )
+    
+    # Google vis
+    gvisBubbleChart(df,idvar="effect",xvar="aa",yvar="occurrence",
+                    options=list(
+                      title=paste0("Mutation frequency for protein ",protein," (",niceprotein,") in ",country),
+                      hAxis=paste0('{viewWindowMode: "maximized", title: "aa coordinate", minValue:0, maxValue: ',plen,'}'),
+                      vAxis=paste0('{viewWindowMode: "maximized", title: "',ylab,'", minValue:0, maxValue: ',maxValue,'}')   ,
+                      bubble='{textStyle: {fontSize: 11, color: "black", bold: true}}',
+                      sizeAxis='{maxSize: 5, maxValue: 100}',
+                      height=600
+                    )
+    )
+  })
+  # Time stuff
+  output$timecountries<-renderUI({
+    selectizeInput("timecountry","Select Country: ",
+                   choices=as.list(unique(c("World",sort(metadata$country)))),
+                   selected="World")
+  })
+  
+  output$timemuts<-renderUI({
+    country<-input$timecountry
+    if(is.null(country)){country<-"World"}
+    load(paste0("data/times/times-",country,".rda"))
+    selectizeInput("timemut","Select Mutation: ",
+                   choices=as.list(rownames(times)),
+                   selected="S:D614G")
+  })
+  
+  output$timeplot<-renderPlot({
+    country<-input$timecountry
+    mut<-input$timemut
+    if(is.null(country)){country<-"World"}
+    load(paste0("data/times/times-",country,".rda"))
+    
+    # Start plotting
+    par(las=2,mar=c(8,5,5,1),mfrow=c(1,2))
+    
+    # Nr of mut
+    track<-times[mut,]
+    par(cex=1.3)
+    plot(track,xaxt="n",xlab="",ylab="nr of mutations detected",main=paste0(mut," abundance in ",country),pch=20)
+    axis(1,at=1:length(track),labels=names(track))
+    grid()
+    
+    # Percentage of mut
+    mutsum<-apply(times,2,sum)
+    perctrack<-track/mutsum*100
+    plot(perctrack,xaxt="n",xlab="",ylab="% of all mutations sequenced",main=paste0(mut," frequency in ",country),pch=20)
+    axis(1,at=1:length(perctrack),labels=names(perctrack))
+    grid()
+  })
+  
   
 }
 

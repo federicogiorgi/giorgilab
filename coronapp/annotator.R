@@ -263,6 +263,9 @@ annotator<-function(nucmerfile,genomefasta,genomegff3){
     setTxtProgressBar(pb,pbi)
   }
   results<-as.data.frame(results,stringsAsFactors=FALSE)
+  varname<-paste0(results$protein,":",results$variant)
+  results<-cbind(results,varname)
+  results$varname<-as.character(results$varname)
   return(results)
 }
 

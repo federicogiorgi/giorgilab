@@ -12,8 +12,6 @@ sudo usermod -aG sudo daniele
 cd /srv/shiny-server/coronapp
 
 
-
-
 # Watch log(s)
 sudo tail -f /var/log/shiny-server.log
 
@@ -28,6 +26,37 @@ sudo systemctl enable shiny-server
 # Restart it
 sudo systemctl restart shiny-server
 
+# Sometimes Apache is in conflict
+sudo /etc/init.d/apache2 stop
 
 # Install packages as shiny
 sudo su - shiny
+
+
+
+## Github create
+cd /srv/shiny-server
+echo "# giorgilab" > README.md
+git init
+git add .
+git config --global user.email "federico.giorgi@gmail.com"
+# use .gitignore as a list of files not to put on git
+git commit -m "first commit"
+git remote add origin git@github.com:federicogiorgi/giorgilab.git
+#git config http.postBuffer 524288000 # Increase buffer size of https upload
+#git rm --cached -r coronapp_prototype/*
+#git gc --aggressive
+git push -u origin master
+
+## Github push
+cd /srv/shiny-server
+git add .
+git commit -m "update"
+git push -u origin master
+
+
+
+
+
+
+
