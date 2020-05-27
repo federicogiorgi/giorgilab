@@ -312,36 +312,39 @@ function(input, output) {
       ylab<-"Occurrence of event (%)"
       maxValue<-100
     }
+    # Variant class
+    vc<-setNames(tomap$varclass,tomap$variant)
+    vc<-vc[unique(names(vc))]
+
+    # Distinguish silent from aa-changing
+    # I wanna taste you but your lips are venomous poison
+    status<-vc[labs]
+    status[status%in%c("SNP","SNP_stop",
+                       "insertion","insertion_frameshift","insertion_stop",
+                       "deletion","deletion_frameshift","deletion_stop")]<-"aa change"
+    status[status%in%c("SNP_silent","extragenic")]<-"silent"
+    #save(df,status,file="df.rda")
+    
     
     # Set up object for plot
     df<-data.frame(
       aa=occloc,
       occurrence=occ,
       effect=labs,
+      status=status,
       stringsAsFactors=FALSE
     )
     
-    # Distinguish silent from aa-changing
-    change<-t(sapply(df$effect,function(x){
-      strsplit(x,"\\d+")[[1]]
-    }))
-    df$status<-apply(change,1,function(x){
-      if(x[1]!=x[2]){
-        return("aa change")
-      } else {
-        return("silent")
-      }
-    })
-    
     
     # Google vis
-    gvisBubbleChart(df,idvar="effect",xvar="aa",yvar="occurrence",#colorvar="status",
+    gvisBubbleChart(df,idvar="effect",xvar="aa",yvar="occurrence",colorvar="status",
                     options=list(
                       title=paste0("Mutation frequency for protein ",protein," (",niceprotein,") in user-provided dataset"),
                       hAxis=paste0('{viewWindowMode: "maximized", title: "aa coordinate", minValue:0, maxValue: ',plen,'}'),
                       vAxis=paste0('{viewWindowMode: "maximized", title: "',ylab,'", minValue:0, maxValue: ',maxValue,'}')   ,
                       bubble='{textStyle: {fontSize: 11, color: "black", bold: true}}',
                       sizeAxis='{maxSize: 5, maxValue: 100}',
+                      colors='["red","cornflowerblue"]',
                       height=600
                     )
     )
