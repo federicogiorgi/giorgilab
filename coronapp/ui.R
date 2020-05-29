@@ -13,6 +13,20 @@ shinyUI(
                   <p style="margin-left:15px;
                   margin-right:15px;
                   margin-top:10px;
+                  text-align:justify;
+                  font-size:14px;
+                  color:white;
+                  ">
+                  <i>coronapp</i> is a web application written in Shiny with a double purpose:
+                  <ul style="padding:10; margin:0;">
+                  <li>Monitor SARS-CoV-2 worldwide mutations</li>
+                  <li>Annotate user-provided mutations</li>
+                  </ul>
+                  </p>
+                  <br>
+                  <p style="margin-left:15px;
+                  margin-right:15px;
+                  margin-top:10px;
                   margin-bottom:-30px;
                   text-align:justify;
                   font-size:16px;
