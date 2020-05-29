@@ -1,6 +1,3 @@
-packages<-c("shiny","shinyjs","shinythemes","shinydashboard","DT","googleVis","shinybusy")
-sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
-
 refgenomes<-c("SARS-CoV-2 (NC_045512.2)"="NC_045512.2","Parvo B19 (NC_000883.2)"="NC_000883.2")
 
 shinyUI(
@@ -61,7 +58,7 @@ shinyUI(
     
     
     dashboardBody(
-      add_busy_spinner(spin = "fading-circle"),
+      #add_busy_spinner(spin = "fading-circle"),
       shinyjs::useShinyjs(),
       tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
       tags$head(
@@ -77,7 +74,7 @@ shinyUI(
           textOutput("nseq"),
           textOutput("nloci"),
           textOutput("nevents"),
-          plotOutput("plot01",click="plot_click",width="95%",height="700px"),
+          plotOutput("plot01",click="plot_click",width="95%",height="700px") %>% withSpinner(color="black"),
           hr(),
           fluidRow(
             downloadButton(outputId="downloadCSV",
@@ -107,7 +104,7 @@ shinyUI(
       wellPanel(
         id="worldwide",
         h1("Current Status of SARS-CoV-2 mutational data"),
-        h5("updated May 25, 2020"),
+        h5("updated May 30, 2020"),
         textOutput("wwnseq"),
         textOutput("wwnloci"),
         textOutput("wwnevents"),
@@ -124,7 +121,7 @@ shinyUI(
           )
         ),
         fluidRow(
-          htmlOutput("wwgooglevis")
+          htmlOutput("wwgooglevis") %>% withSpinner(color="black")
         ),
         hr(),
         h3(textOutput("country")),

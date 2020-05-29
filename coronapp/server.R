@@ -1,9 +1,10 @@
-packages <- c("Biostrings","seqinr","shiny","stringi","data.table","googleVis","corto")
+packages<-c(
+  "Biostrings","seqinr","dplyr",
+  "shiny","shinyjs","shinythemes","shinycssloaders","shinydashboard",
+  "stringi","data.table","googleVis","DT","corto"
+)
 sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
 source("annotator.R")
-
-
-
 
 function(input, output) {
   message(paste0("Server started at ",Sys.time()))
