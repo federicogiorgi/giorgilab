@@ -209,7 +209,7 @@ function(input, output) {
     if (!(is.null(input$fasta))){
       return(results)
     }
-  })
+  },rownames=FALSE)
   
   output$wwcontents <- renderDataTable({
     country<-input$country
@@ -223,7 +223,7 @@ function(input, output) {
       toshow$sample<-as.character(toshow$sample)
     }
     return(toshow)
-  })
+  },rownames=FALSE)
   
   
   output$downloadCSV <- downloadHandler(
