@@ -163,9 +163,3 @@ shinyUI(
     
   )
 )
-
-# add_busy_bar(color = "red", height = "8px")
-# https://cran.r-project.org/web/packages/shinybusy/vignettes/shinybusy-usage.html
-# https://shiny.rstudio.com/articles/progress.html
-
-
