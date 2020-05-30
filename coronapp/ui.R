@@ -58,7 +58,8 @@ shinyUI(
                 font-size:14px;
                 color:white;">
                 
-                <a href="example.fasta">Example input multiFASTA</a>
+                <a style= "font-size:16px;" href="example.fasta">Example input multiFASTA</a>
+                <br>
                 <br>
                 The FASTA annotator will discover and annotate every mutation present in the uploaded SARS-CoV-2 genomic sequences, even partial.
                 The GFF3 genome annotation file is available <a href="NC_045512.2_annot.gff3">here</a>
