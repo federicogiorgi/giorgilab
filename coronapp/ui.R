@@ -1,3 +1,9 @@
+packages<-c(
+  "Biostrings","seqinr","dplyr",
+  "shiny","shinyjs","shinythemes","shinycssloaders","shinydashboard",
+  "stringi","data.table","googleVis","DT"
+)
+sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
 refgenomes<-c("SARS-CoV-2 (NC_045512.2)"="NC_045512.2","Parvo B19 (NC_000883.2)"="NC_000883.2")
 
 shinyUI(

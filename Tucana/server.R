@@ -178,7 +178,7 @@ shinyServer(function(input, output, session) {
                              selected = previousGenes[2,2], server = TRUE)
       }
     }
-    else if (x == "Search the main DEGs for the couples healthy/tumor")
+    else if (x == "Search the main DCEGs for two tissues")
     {
       shinyjs::show("tissue2",anim = TRUE, animType = "slide")
       shinyjs::hide("g2",anim = TRUE, animType = "slide")
@@ -291,7 +291,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$DEGTable <- renderDataTable({
-    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor")
+    if(input$selectMode == "Search the main DCEGs for two tissues")
     {
       
       message(paste0(Sys.time()," searching DEGs about ",g1()," in ",input$tissue1," and ",input$tissue2))
@@ -313,7 +313,7 @@ shinyServer(function(input, output, session) {
   },rownames = FALSE)
   
   output$plotRowDEGT1 <- renderPlot({
-    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor" & g1()!="")
+    if(input$selectMode == "Search the main DCEGs for two tissues" & g1()!="")
     {
       par(mar=c(4.8,5.1,4.8,2.1))
       req(input$DEGTable_rows_selected)
@@ -327,7 +327,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$plotRowDEGT2 <- renderPlot({
-    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor" & g1()!="")
+    if(input$selectMode == "Search the main DCEGs for two tissues" & g1()!="")
     {
       par(mar=c(4.8,5.1,4.8,2.1))
       req(input$DEGTable_rows_selected)

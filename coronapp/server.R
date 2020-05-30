@@ -1,10 +1,52 @@
 packages<-c(
   "Biostrings","seqinr","dplyr",
   "shiny","shinyjs","shinythemes","shinycssloaders","shinydashboard",
-  "stringi","data.table","googleVis","DT","corto"
+  "stringi","data.table","googleVis","DT"
 )
 sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
 source("annotator.R")
+kmgformat<-function (input, roundParam = 1) {
+  signs <- sign(input)
+  signs[signs == 1] <- ""
+  signs[signs == -1] <- "-"
+  absinput <- abs(input)
+  output <- c()
+  for (i in absinput) {
+    if (i < 1000) {
+      output <- c(output, i)
+    }
+    else if (i < 1e+06) {
+      i <- round(i/1000, roundParam)
+      i <- paste0(i, "K")
+      output <- c(output, i)
+    }
+    else if (i < 1e+09) {
+      i <- round(i/1e+06, roundParam)
+      i <- paste0(i, "M")
+      output <- c(output, i)
+    }
+    else if (i < 1e+12) {
+      i <- round(i/1e+09, roundParam)
+      i <- paste0(i, "G")
+      output <- c(output, i)
+    }
+    else if (i < 1e+15) {
+      i <- round(i/1e+12, roundParam)
+      i <- paste0(i, "T")
+      output <- c(output, i)
+    }
+    else if (i < 1e+18) {
+      i <- round(i/1e+15, roundParam)
+      i <- paste0(i, "P")
+      output <- c(output, i)
+    }
+    else {
+      output <- c(output, i)
+    }
+  }
+  output <- paste0(signs, output)
+  return(output)
+}
 
 function(input, output) {
   message(paste0("Server started at ",Sys.time()))
