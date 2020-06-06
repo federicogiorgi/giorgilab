@@ -29,6 +29,15 @@ shinyUI(
                   <li>Annotate user-provided mutations</li>
                   </ul>
                   </p>
+                  <p style="margin-left:15px;
+                  margin-right:15px;
+                  margin-top:10px;
+                  text-align:justify;
+                  font-size:14px;
+                  color:white;
+                  ">
+                  A full descripion of the app is available on <a href=https://www.biorxiv.org/content/10.1101/2020.05.31.124966v1>our preprint manuscript</a>.
+                  </p>
                   <br>
                   <p style="margin-left:15px;
                   margin-right:15px;
@@ -58,7 +67,7 @@ shinyUI(
                 font-size:14px;
                 color:white;">
                 
-                <a style= "font-size:16px;" href="example.fasta">Example input multiFASTA</a>
+                <a style= "font-size:16px;" href="example.fasta">Download example input multiFASTA</a>
                 <br>
                 <br>
                 The FASTA annotator will discover and annotate every mutation present in the uploaded SARS-CoV-2 genomic sequences, even partial.
@@ -71,7 +80,7 @@ shinyUI(
                 text-align:center;
                 font-size:14px;
                 color:white;">
-                <img src="logowhite.png" width=150>
+                <img src="logowhite.png" width=160>
                 </p>'
       ),
       width = 300
@@ -125,7 +134,7 @@ shinyUI(
       wellPanel(
         id="worldwide",
         h1("Current Status of SARS-CoV-2 mutational data"),
-        h5("updated May 30, 2020"),
+        h5("updated June 06, 2020"),
         textOutput("wwnseq"),
         textOutput("wwnloci"),
         textOutput("wwnevents"),
@@ -173,6 +182,7 @@ shinyUI(
       HTML('<footer id="colophon" role="contentinfo" align="center">
         			<div class="site-info">
         			   <p>App developed by Federico M. Giorgi, Eleonora Fornasari, Daniele Mercatelli & Luca Triboli</p>
+        			   <p><a href = "mailto: federico.giorgi@unibo.it">Write us</a> if you have questions and suggestions suggestions</p>
             	   <h5><a href="/"><img class="itsus" src="itsus.png" alt="It is us - Coronavirus Genome Annotator" width=100></a></h5>
         			   <br>
         			</div>

@@ -115,7 +115,7 @@ function(input, output) {
     
     #message(getwd())
     #message(system("ls tmp"))
-    system(paste0("rm ",nucmer.coords," ",nucmer.delta))
+    system(paste0("rm ",nucmer.coords," ",nucmer.delta," ",nucmer.headers))
     message(system("ls tmp"))
     nevents<-system(paste0("wc -l ",nucmer.snps),intern=TRUE)
     nevents<-strsplit(nevents," ")[[1]][1]
