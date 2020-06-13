@@ -1,5 +1,4 @@
 annotator<-function(nucmerfile,genomefasta,genomegff3){
-  
   ### R part ----
   # Load variant list
   nucmer<-read.delim(nucmerfile,as.is=TRUE,skip=4,header=FALSE)
@@ -249,7 +248,7 @@ annotator<-function(nucmerfile,genomefasta,genomegff3){
             } else { # Changed aa scenario
               refaa<-paste0(refpepseq[mutpos],collapse="")
               varaa<-paste0(varpepseq[mutpos],collapse="")
-              if(any(varaa=="*")){
+              if(length(grep("\\*",varaa))==1){
                 output<-c(paste0(refaa,mutpos[1],varaa),"SNP_stop")
               } else {
                 output<-c(paste0(refaa,mutpos[1],varaa),"SNP")
@@ -266,6 +265,7 @@ annotator<-function(nucmerfile,genomefasta,genomegff3){
   varname<-paste0(results$protein,":",results$variant)
   results<-cbind(results,varname)
   results$varname<-as.character(results$varname)
+  results<-unique(results) # Deduplicate rows
   return(results)
 }
 
