@@ -109,13 +109,20 @@ shinyUI(
         menuItem("Info", tabName = "infos",
           HTML('<span style="margin-left:30px;
                  margin-right:15px;
-                 margin-top:10px;
-                 text-align:justify;
-                 font-size:14px;
-                 color:white;
-                 white-space: normal;">
-          Enter text here
-          </span>')
+               margin-top:10px;
+               text-align:justify;
+               font-size:14px;
+               color:white;
+               white-space: normal;">
+               Tucana is a tool that provides information about genes coexpression
+               in different types of tissues. Input datasets are available in three
+               formats: VST, FPKM and TPM. There are four possible analysis: a single
+               correlation analysis that shows the Pearson or Sperman correlation value
+               between two genes in a tissue, a comparison of correlation between two 
+               selected tissues, a table of the top co-expressed genes for the gene in
+               input and a tissue and a table of the top differentialy co-expressed genes for
+               the gene selected in the input in two tissues.
+               </span>')
           ,icon=icon("info")),
         menuItem("Data", tabName = "data",
           HTML('<span style="margin-left:15px;
@@ -126,7 +133,10 @@ shinyUI(
                  color:white;
                  white-space: normal;">
                  <br>
-          Enter text here
+          Expression datasets comes from GTeX and TCGA online databases. Healthy tissues
+          data come from the first one while tumoral ones come from the second. Moreover,
+          three datasets containing NBL data have been retrieved from KOCAK, NRC and TARGET
+          databases.
           </span>')
           ,icon=icon("database"))
       )
