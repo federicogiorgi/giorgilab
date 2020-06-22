@@ -1,7 +1,7 @@
 
 
 
-updated<-"updated June 13, 2020"
+updated<-"updated June 22, 2020"
 
 
 ### Loading packages and defining functions
