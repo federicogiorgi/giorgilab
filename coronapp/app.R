@@ -266,10 +266,10 @@ server <- function(input,output,server){
         paste0("Number of samples: ",length(headers))
     })
     output$wwnloci<-renderText({
-        paste0("Number of distinct mutated loci: ",length(unique(results$variant)))
+        paste0("Number of distinct mutated loci: ",nrloci)
     })
     output$wwnevents<-renderText({
-        paste0("Total number of mutational events: ",nrow(results))
+        paste0("Total number of mutational events: ",nrevents)
     })
     output$country<-renderText({
         paste0("Mutation Table for ",input$tablecountry)
