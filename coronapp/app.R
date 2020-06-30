@@ -1,7 +1,7 @@
 
 
 
-updated<-"updated June 22, 2020"
+updated<-"updated June 30, 2020"
 
 
 ### Loading packages and defining functions
@@ -375,7 +375,6 @@ server <- function(input,output,server){
         vc<-vc[unique(names(vc))]
         
         # Distinguish silent from aa-changing
-        # I wanna taste you but your lips are venomous poison
         status<-vc[labs]
         status[status%in%c("SNP","SNP_stop",
                            "insertion","insertion_frameshift","insertion_stop",
