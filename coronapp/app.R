@@ -158,9 +158,14 @@ ui<-dashboardPage(
                        uiOutput("gvisproteins")
                 ),
                 column(2,
-                       checkboxInput("gvislog10", "Log10", TRUE),
-                       checkboxInput("gvispercentage", "Percentage", FALSE)
+                       radioButtons("gvisradio", "Data:",
+                                    c("Original"="orig",
+                                      "Log10"="log10",
+                                      "Percentage" = "perc"
+                                    ))
+                       
                 )
+                
             ),
             fluidRow(
                 htmlOutput("wwgooglevis") %>% withSpinner(color="black"),
@@ -411,8 +416,7 @@ server <- function(input,output,server){
     output$wwgooglevis<-renderGvis({
         ### Parameters
         protein<-input$protein
-        log10<-input$gvislog10
-        percentage<-input$gvispercentage
+        transform<-input$gvisradio
         country<-input$country
         if(is.null(country)){country<-"World"}
         
@@ -435,16 +439,19 @@ server <- function(input,output,server){
         plen<-(coords[2]-coords[1]+1)/3
         ylab<-"Occurrence of event"
         maxValue<-max(occ)+1
-        if(log10){
+        
+        if(transform=="log10"){
             occ<-log10(occ+0.1)
             maxValue<-max(occ)+1
             ylab<-"Occurrence of event (Log10)"
-        }else if(percentage){
-            occ<-as.numeric(round(100*occ/length(csamples),3))
+            
+        }
+        if(transform=="perc"){
+            occ<-as.numeric(round(100*occ/length(headers),3))
             ylab<-"Occurrence of event (%)"
             maxValue<-100
         }
-        
+
         # Distinguish silent from aa-changing
         # I wanna taste you but your lips are venomous poison
         status<-vc[labs]

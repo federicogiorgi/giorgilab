@@ -153,8 +153,11 @@ ui<-dashboardPage(
                            uiOutput("uiproteins")
                     ),
                     column(2,
-                           checkboxInput("uilog10", "Log10", FALSE),
-                           checkboxInput("uipercentage", "Percentage", FALSE)
+                           radioButtons("gvisradio", "Data:",
+                                        c("Original"="orig",
+                                          "Log10"="log10",
+                                          "Percentage" = "perc"
+                                        ))
                     )
                 ),
                 fluidRow(
@@ -345,8 +348,8 @@ server <- function(input,output,server){
     output$googlevis <- googleVis::renderGvis({
         ### Parameters
         protein<-input$uiprotein
-        log10<-input$uilog10
-        percentage<-input$uipercentage
+        transform<-input$gvisradio
+        
         
         ### Process parameters
         # Select Protein
@@ -362,12 +365,14 @@ server <- function(input,output,server){
         plen<-(coords[2]-coords[1]+1)/3
         ylab<-"Occurrence of event"
         maxValue<-max(occ)+1
-        if(log10){
+        if(transform=="log10"){
             occ<-log10(occ+0.1)
             maxValue<-max(occ)+1
             ylab<-"Occurrence of event (Log10)"
-        }else if(percentage){
-            occ<-as.numeric(round(100*occ/length(csamples),3))
+            
+        }
+        if(transform=="perc"){
+            occ<-as.numeric(round(100*occ/length(headers),3))
             ylab<-"Occurrence of event (%)"
             maxValue<-100
         }
@@ -381,7 +386,7 @@ server <- function(input,output,server){
                            "insertion","insertion_frameshift","insertion_stop",
                            "deletion","deletion_frameshift","deletion_stop")]<-"aa change"
         status[status%in%c("SNP_silent","extragenic")]<-"silent"
-
+        
         # Set up object for plot
         df<-data.frame(
             aa=occloc,
