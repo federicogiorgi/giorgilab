@@ -174,7 +174,7 @@ ui<-dashboardPage(
         HTML('
         <footer id="colophon" role="contentinfo" align="center">
         <div class="site-info">
-        <p>App developed by Federico M. Giorgi, Eleonora Fornasari, Daniele Mercatelli & Luca Triboli</p>
+        <p>App developed by Federico M. Giorgi, Department of Pharmacy and Biotechnology, University of Bologna, Italy</p>
         <p><a href = "mailto: federico.giorgi@unibo.it">Write us</a> if you have questions and suggestions suggestions</p>
         <h5><a href="/"><img class="itsus" src="itsus.png" alt="It is us - Coronavirus Genome Annotator" width=100></a></h5>
         <br>
