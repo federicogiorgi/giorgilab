@@ -1,6 +1,15 @@
-packages <- c("shiny","ggplot2","DT","ggvis","dplyr","shinyjs","shinyBS",
-              "shinydashboard","shinyjqui","parallel","gridExtra","shinybusy")
-sapply(packages, function(x){suppressPackageStartupMessages(library(x,character.only=TRUE))})
+suppressPackageStartupMessages(library(shiny))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(DT))
+suppressPackageStartupMessages(library(survival))
+suppressPackageStartupMessages(library(ggvis))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(shinyjs))
+suppressPackageStartupMessages(library(shinyBS))
+suppressPackageStartupMessages(library(shinydashboard))
+suppressPackageStartupMessages(library(shinyjqui))
+suppressPackageStartupMessages(library(shinymaterial))
+suppressPackageStartupMessages(library(shinycssloaders))
 
 cotfArray<-read.delim("/srv/shiny-server/Tucana/data/cotfgenes_2018_08_06.txt",as.is=TRUE,sep="\t",header=FALSE)
 signalingArray<-read.delim("/srv/shiny-server/Tucana/data/signaling_2018_08_06.txt",as.is=TRUE,sep="\t",header=FALSE)

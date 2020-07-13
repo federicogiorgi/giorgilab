@@ -1,10 +1,18 @@
+Packages <- c("shiny","ggplot2","DT","shinythemes","ggvis","shinyjs","shinyBS","shinydashboard",
+              "shinymaterial","shinycssloaders","shinybusy")
+lapply(Packages, function(x){
+  suppressPackageStartupMessages(library)
+  }
+)
 source("/srv/shiny-server/Tucana/data/LucaFunct.R")
+library(shinybusy)
+library(shinydashboardPlus)
 
 allTissue = insertPath("/srv/shiny-server/DATA/")
 choicesVec <- list("Show 2 genes correlation in a tissue",
                    "Compare 2 genes correlation in two tissues",
                    "Search the main coexpressor genes for a gene in a tissue",
-                   "Search the main DCEGs for two tissues")
+                   "Search the main DEGs for the couples healthy/tumor")
 
 # tissueCouple <- list("tcga_LGG,gtex_Brain",
 #                      "tcga_BRCA,gtex_Breast",
@@ -82,7 +90,7 @@ shinyUI(
                       selected = "tcga_COAD"),
           bsTooltip("tissue2", "Second tissue to be selected",placement = "top",
                     options = list(container = "body")),
-          # Abbreviation Tables
+          # Abbreviation  Tables
           actionButton("showTable","TCGA CODE TABLES"),
           #Select type of input data
           radioButtons(inputId = "selectDataType",
@@ -109,20 +117,20 @@ shinyUI(
         menuItem("Info", tabName = "infos",
           HTML('<span style="margin-left:30px;
                  margin-right:15px;
-               margin-top:10px;
-               text-align:justify;
-               font-size:14px;
-               color:white;
-               white-space: normal;">
-               Tucana is a tool that provides information about genes coexpression
-               in different types of tissues. Input datasets are available in three
-               formats: VST, FPKM and TPM. There are four possible analysis: a single
-               correlation analysis that shows the Pearson or Sperman correlation value
-               between two genes in a tissue, a comparison of correlation between two 
-               selected tissues, a table of the top co-expressed genes for the gene in
-               input and a tissue and a table of the top differentialy co-expressed genes for
-               the gene selected in the input in two tissues.
-               </span>')
+                 margin-top:10px;
+                 text-align:justify;
+                 font-size:14px;
+                 color:white;
+                 white-space: normal;">
+          Tucana is a tool that provides information about genes coexpression
+          in different types of tissues. Input datasets are available in three
+          formats: VST, FPKM and TPM. There are four possible analysis: a single
+          correlation analysis that shows the Pearson or Sperman correlation value
+          between two genes in a tissue, a comparison of correlation between two 
+          selected tissues, a table of the top co-expressed genes for the gene in
+          input and a tissue and a table of the top differentialy co-expressed genes for
+          the gene selected in the input in two tissues.
+          </span>')
           ,icon=icon("info")),
         menuItem("Data", tabName = "data",
           HTML('<span style="margin-left:15px;
@@ -249,9 +257,9 @@ shinyUI(
         )
       )
     ),
-    HTML('<footer id="colophon" role="contentinfo" align="center" style="color:white;">
+    HTML('<footer id="colophon" role="contentinfo" align="center">
         			<div class="site-info">
-        			   <p>Copyright (c) 2020 Luca Triboli All rights reserved</p>
+        			   <p style="color:white;">Copyright (c) 2020 Luca Triboli All rights reserved</p>
         			   <h3><a href="/">Giorgilab</a></h3>
         			   <br>
         			</div>

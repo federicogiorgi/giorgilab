@@ -1,4 +1,6 @@
 source("/srv/shiny-server/KaMeR/data/stepsurvival.R")
+library(shinybusy)
+library(shinydashboardPlus)
 
 allTissue = insertPath("/srv/shiny-server/DATA/")
 choicesVec <- list("Show classic survival study",
@@ -8,19 +10,14 @@ choicesVec <- list("Show classic survival study",
 shinyjs::useShinyjs()
 # Define UI for application
 shinyUI(
-  dashboardPage(skin = "black",
-    dashboardHeader(title = "KaMeR"),
+  shinydashboardPlus::dashboardPagePlus(
+    shinydashboardPlus::dashboardHeaderPlus(title = "KaMeR"),
     dashboardSidebar(
+      add_busy_spinner(spin="atom",position = "bottom-right",
+                       height = "300px",width = "300px",margins = c(530,50)),
       shinyjs::useShinyjs(),
-      HTML('<p style="margin-left:15px;
-                        margin-right:15px;
-                        margin-top:10px;
-                        font-style:italic;
-                        text-align:justify;
-                        font-size:18px;
-                        color:white;">
-              KaMeR is a tool that perform different survival analysis
-             </p>'),
+      sidebarMenu(
+        menuItem("Input", tabName = "Input", selected = TRUE, startExpanded = TRUE,
       #Select the research
       selectInput(inputId = "selectMode",
                   label = "Select the type of analysis:",
@@ -64,11 +61,90 @@ shinyUI(
       sliderInput(inputId = "stepNum",
                   label = "Steps number",                            
                   min = 3, max = 10, step = 1, value = 10)
+      ,icon=icon("mouse-pointer")),
+      menuItem("Info", tabName = "infos",
+               HTML('<span style="margin-left:30px;
+                    margin-right:15px;
+                    margin-top:10px;
+                    text-align:justify;
+                    font-size:14px;
+                    color:white;
+                    white-space: normal;">
+                    KaMeR is a tool that perform different survival analysis
+                    </span>')
+               ,icon=icon("info")),
+      menuItem("Data", tabName = "data",
+               HTML('<span style="margin-left:15px;
+                    margin-right:15px;
+                    margin-top:10px;
+                    text-align:justify;
+                    font-size:14px;
+                    color:white;
+                    white-space: normal;">
+                    <br>
+                    Expression and clinical datasets comes from GTeX and TCGA online databases. Healthy
+                    tissues data come from the first one while tumoral ones come from the second. Moreover,
+                    three datasets containing NBL data have been retrieved from KOCAK, NRC and TARGET
+                    databases.
+                    </span>')
+               ,icon=icon("database"))
+      )
     ),
     dashboardBody(
+      tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
       tags$head(
-        tags$link(rel="stylesheet", type="text/css",href="bootstrap.css")
+        tags$link(rel="stylesheet", type="text/css",href="style.css")
       ),
+      tags$head(
+        tags$style(
+          HTML('
+               /* logo */
+               .skin-blue .main-header .logo {
+               background-color: #2c3b41;
+               }
+               
+               /* logo when hovered */
+               .skin-blue .main-header .logo:hover {
+               background-color: #2c3b41;
+               }
+               
+               /* navbar (rest of the header) */
+               .skin-blue .main-header .navbar {
+               background-color: #2c3b41;
+               }
+               
+               /* main sidebar */
+               .skin-blue .main-sidebar {
+               background-color:#2c3b41;
+               }
+               
+               /* active selected tab in the sidebarmenu */
+               .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+               background-color: white;
+               color: black;
+               }
+               
+               /* other links in the sidebarmenu */
+               .skin-blue .main-sidebar .sidebar .sidebar-menu a{
+               background-color: black;
+               color: white;
+               }
+               
+               /* toggle button when hovered  */
+               .skin-blue .main-header .navbar .sidebar-toggle:hover{
+               background-color: #2c3b41;
+               }
+               
+               /* body */
+               .content-wrapper, .right-side {
+               background-color: white;
+               }   
+               
+               '
+          )
+        )
+      ),
+      
       shinyjs::useShinyjs(),
       fluidRow(
         column(
@@ -125,7 +201,7 @@ shinyUI(
       ),
       HTML('<footer id="colophon" role="contentinfo" align="center">
         			<div class="site-info">
-        			   <p>Copyright (c) 2020 Luca Triboli All rights reserved</p>
+        			   <p style="color:white;">Copyright (c) 2020 Luca Triboli All rights reserved</p>
         			   <h3><a href="/">Giorgilab</a></h3>
         			   <br>
         			</div>

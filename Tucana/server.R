@@ -1,3 +1,9 @@
+Packages <- c("shiny","ggplot2","DT","survival","ggvis","dplyr","shinyjs","shinyBS","shinydashboard",
+              "shinyjqui","shinymaterial","parallel","gridExtra")
+lapply(Packages, function(x){
+  suppressPackageStartupMessages(library)
+  }
+)
 source("/srv/shiny-server/Tucana/data/LucaFunct.R")
 
 dataframe1 <- data.frame("Study Abbreviation" = c("NBL","ACC","BLCA","BRCA","CESC",
@@ -178,7 +184,7 @@ shinyServer(function(input, output, session) {
                              selected = previousGenes[2,2], server = TRUE)
       }
     }
-    else if (x == "Search the main DCEGs for two tissues")
+    else if (x == "Search the main DEGs for the couples healthy/tumor")
     {
       shinyjs::show("tissue2",anim = TRUE, animType = "slide")
       shinyjs::hide("g2",anim = TRUE, animType = "slide")
@@ -291,7 +297,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$DEGTable <- renderDataTable({
-    if(input$selectMode == "Search the main DCEGs for two tissues")
+    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor")
     {
       
       message(paste0(Sys.time()," searching DEGs about ",g1()," in ",input$tissue1," and ",input$tissue2))
@@ -313,7 +319,7 @@ shinyServer(function(input, output, session) {
   },rownames = FALSE)
   
   output$plotRowDEGT1 <- renderPlot({
-    if(input$selectMode == "Search the main DCEGs for two tissues" & g1()!="")
+    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor" & g1()!="")
     {
       par(mar=c(4.8,5.1,4.8,2.1))
       req(input$DEGTable_rows_selected)
@@ -327,7 +333,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$plotRowDEGT2 <- renderPlot({
-    if(input$selectMode == "Search the main DCEGs for two tissues" & g1()!="")
+    if(input$selectMode == "Search the main DEGs for the couples healthy/tumor" & g1()!="")
     {
       par(mar=c(4.8,5.1,4.8,2.1))
       req(input$DEGTable_rows_selected)
@@ -352,7 +358,7 @@ shinyServer(function(input, output, session) {
     showModal(plotModal())
   })
   
-  output$tableSigle <- renderDataTable(
+    output$tableSigle <- renderDataTable(
     dataframe1
   )
   

@@ -61,7 +61,7 @@ plotclassicsurv<-function(oritrack,survival,mygene,optcex,title="Kaplan Meier Cu
              col=colors,mark.time=TRUE, cex=optcex, cex.lab=optcex,
              cex.axis=optcex, cex.main=optcex+0.75, cex.sub=optcex
         )
-        mtext(paste("p =",signif(p,4)," (Samples: ",nrow(survival)," - Deaths: ",sum(survival[,2],na.rm=TRUE),")",sep=""),cex=0.65)
+        mtext(paste("p =",signif(p,4)," (Samples: ",nrow(survival)," - Deaths: ",sum(survival[,2],na.rm=TRUE),")",sep=""),cex=optcex)
         if(colorizeSignificant){
             if(p<=0.05&sign=="pos"){rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#FF000022")}
             if(p<=0.05&sign=="neg"){rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#FF000022")}
