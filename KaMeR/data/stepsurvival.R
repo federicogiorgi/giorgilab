@@ -67,7 +67,7 @@ plotclassicsurv<-function(oritrack,survival,mygene,optcex,title="Kaplan Meier Cu
             if(p<=0.05&sign=="neg"){rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#FF000022")}
         }
         grid(col="grey")
-        legend("bottomleft",col=colors,legend=substr(names(sfit$strata),7,nchar(names(sfit$strata))),lty=1,lwd=3,bg="white")	
+        legend("topright",col=colors,legend=substr(names(sfit$strata),7,nchar(names(sfit$strata))),lty=1,lwd=3,bg="white",cex=1.5)	
     }
     if(sign=="neg"){
         p<--p

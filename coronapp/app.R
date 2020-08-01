@@ -1,7 +1,7 @@
 
 
 
-updated<-"updated June 30, 2020"
+updated<-"updated August 1, 2020"
 
 
 ### Loading packages and defining functions
@@ -162,7 +162,9 @@ ui<-dashboardPage(
                                     c("Original"="orig",
                                       "Log10"="log10",
                                       "Percentage" = "perc"
-                                    ))
+                                    ),
+                                    selected="log10"
+                       )
                        
                 )
                 
@@ -451,7 +453,7 @@ server <- function(input,output,server){
             ylab<-"Occurrence of event (%)"
             maxValue<-100
         }
-
+        
         # Distinguish silent from aa-changing
         # I wanna taste you but your lips are venomous poison
         status<-vc[labs]

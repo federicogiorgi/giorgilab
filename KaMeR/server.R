@@ -386,7 +386,7 @@ shinyServer(function(input, output, session) {
       subsurv<-surv[names(subtrack),]
       sdiff<-survdiff(subsurv~subtrack)
       p<-1-pchisq(sdiff$chisq,df=2)
-      mtext(paste("p =",signif(p,5)," (Samples: ",nrow(subsurv)," - Deaths: ",sum(subsurv[,2]),")",sep=""),cex=0.7)
+      mtext(paste("p =",signif(p,5)," (Samples: ",nrow(subsurv)," - Deaths: ",sum(subsurv[,2]),")",sep=""),cex=input$cex)
       message(p2)
       p2
     }
@@ -413,7 +413,7 @@ shinyServer(function(input, output, session) {
       oritrack<-expSurva[input$g1,]
       
       if( !(length(surv)<100) & !(var(oritrack)==0) ){
-        p<-plotclassicsurv(oritrack,surv,title=paste0(g1()," expression Kaplan Meier"),plot=TRUE,mygene=g1(),input$cex)
+        p<-plotclassicsurv(oritrack,surv,title=paste0(g1()," survival"),plot=TRUE,mygene=g1(),input$cex)
         p
       }
     }
@@ -440,7 +440,7 @@ shinyServer(function(input, output, session) {
       oritrack<-expSurva[g2(),]
       
       if( !(length(surv)<100) & !(var(oritrack)==0) ){
-        p<-plotclassicsurv(oritrack,surv,title=paste0(g2()," expression Kaplan Meier"),plot=TRUE,mygene=g2(),input$cex)
+        p<-plotclassicsurv(oritrack,surv,title=paste0(g2()," survival"),plot=TRUE,mygene=g2(),input$cex)
         p
       }
     }
