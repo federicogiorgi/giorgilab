@@ -1,7 +1,7 @@
 
 
 
-updated<-"updated September 9, 2020"
+updated<-"updated September 15, 2020"
 
 
 ### Loading packages and defining functions
@@ -111,11 +111,11 @@ ui<-dashboardPage(
             id="worldwide",
             h1("Current Status of SARS-CoV-2 mutational data"),
             h5(updated),
-            fluidRow(
-                downloadButton(
-                    outputId="world_downloadCSV",
-                    label="Download Full World Results (CSV format)",class="bbutton")
-            ),
+            # fluidRow(
+            #     downloadButton(
+            #         outputId="world_downloadCSV",
+            #         label="Download Full World Results (CSV format)",class="bbutton")
+            # ),
             textOutput("wwnseq"),
             textOutput("wwnloci"),
             textOutput("wwnevents"),
@@ -126,11 +126,11 @@ ui<-dashboardPage(
                        uiOutput("tablecountries")
                 )
             ),
-            fluidRow(
-                downloadButton(
-                    outputId="downloadCSV",
-                    label="Download Visualized Results (CSV format)",class="bbutton")
-            ),
+            # fluidRow(
+            #     downloadButton(
+            #         outputId="downloadCSV",
+            #         label="Download Visualized Results (CSV format)",class="bbutton")
+            # ),
             br(),
             fluidRow(
                 DT::dataTableOutput("wwcontents")
