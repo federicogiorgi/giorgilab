@@ -58,6 +58,10 @@ ui<-dashboardPage(
     dashboardHeader(
         title="COVID-19 genome annotator",
         titleWidth=300
+        ,
+        tags$li(class = "dropdown",
+            tags$script(src = "js/gisaid/gisaid.js")
+        )
     ),
     dashboardSidebar(
         width=300,
@@ -173,6 +177,7 @@ ui<-dashboardPage(
                 htmlOutput("wwgooglevis") %>% withSpinner(color="black"),
             )
         ),
+        HTML('<script>gisaid.addPopups();</script>'),
         HTML('
         <footer id="colophon" role="contentinfo" align="center">
         <div class="site-info">
