@@ -1,7 +1,7 @@
 
 
 
-updated<-"updated September 25, 2020"
+updated<-"updated October 15, 2020"
 
 
 ### Loading packages and defining functions
@@ -58,10 +58,6 @@ ui<-dashboardPage(
     dashboardHeader(
         title="COVID-19 genome annotator",
         titleWidth=300
-        ,
-        tags$li(class = "dropdown",
-            tags$script(src = "js/gisaid/gisaid.js")
-        )
     ),
     dashboardSidebar(
         width=300,
@@ -114,6 +110,11 @@ ui<-dashboardPage(
         wellPanel(
             id="worldwide",
             h1("Current Status of SARS-CoV-2 mutational data"),
+            HTML(
+                '
+                Enabled by data from <a href=https://www.gisaid.org/ target="_blank"><img src=gisaid.png width=100></a>
+                '
+            ),
             h5(updated),
             # fluidRow(
             #     downloadButton(
@@ -130,11 +131,11 @@ ui<-dashboardPage(
                        uiOutput("tablecountries")
                 )
             ),
-            # fluidRow(
-            #     downloadButton(
-            #         outputId="downloadCSV",
-            #         label="Download Visualized Results (CSV format)",class="bbutton")
-            # ),
+            fluidRow(
+                downloadButton(
+                    outputId="downloadCSV",
+                    label="Download Visualized Results (CSV format)",class="bbutton")
+            ),
             br(),
             fluidRow(
                 DT::dataTableOutput("wwcontents")
@@ -177,17 +178,32 @@ ui<-dashboardPage(
                 htmlOutput("wwgooglevis") %>% withSpinner(color="black"),
             )
         ),
-        HTML('<script>gisaid.addPopups();</script>'),
         HTML('
         <footer id="colophon" role="contentinfo" align="center">
         <div class="site-info">
+        <p>GISAID data provided on this website are subject to GISAID’s <a href=https://www.gisaid.org/registration/terms-of-use/ target="_blank">Terms and Conditions</a></p>
         <p>App developed by Federico M. Giorgi, Department of Pharmacy and Biotechnology, University of Bologna, Italy</p>
         <p><a href = "mailto: federico.giorgi@unibo.it">Write us</a> if you have questions and suggestions suggestions</p>
         <h5><a href="/"><img class="itsus" src="itsus.png" alt="It is us - Coronavirus Genome Annotator" width=100></a></h5>
         <br>
+        <p>We are very grateful to the GISAID Initiative and all its data contributors, i.e. the Authors from the Originating laboratories responsible for obtaining the specimens and the Submitting laboratories where genetic sequence data were generated and shared
+        via the GISAID Initiative, on which this research is based.</p>
+        <br>
+        <p>Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46.</p>
+        <p>DOI: <a href=https://onlinelibrary.wiley.com/doi/full/10.1002/gch2.1018 target="_blank">10.1002/gch2.1018</a> PMCID: <a href=https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/ target="_blank">31565258</a></p>
+        <br>
+        <br>
+        <p>Note: When using results from these analyses in your manuscript, ensure that you also acknowledge the Contributors of data, i.e. We gratefully acknowledge all the Authors from the Originating laboratories responsible for obtaining the specimens and
+        the Submitting laboratories where genetic sequence data were generated and shared via the GISAID Initiative, on which this research is based and cite the following reference</p>
+        <br>
+        <p>Shu, Y., McCauley, J. (2017) GISAID: Global initiative on sharing all influenza</p>
+        <p>DOI: <a href=https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2017.22.13.30494 target="_blank">10.2807/1560-7917.ES.2017.22.13.30494</a>
+        PMCID: <a href=https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5388101/ target="_blank">PMC5388101</a></p>
         </div>
         </footer>
+        
         '
+             
         )
     )
 )
@@ -528,6 +544,9 @@ server <- function(input,output,server){
         axis(1,at=1:length(perctrack),labels=names(perctrack))
         grid()
     })
+    
+    
+    
 }
 
 shinyApp(ui,server)

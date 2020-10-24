@@ -1,21 +1,31 @@
-annotator<-function(nucmerfile,genomefasta,genomegff3){
+library(seqinr)
+library(Biostrings)
+
+annotator<-function(nucmerfile,genomefasta,genomegff3,prevnucmerfile=NULL){
   ### R part ----
   # Load variant list
   nucmer<-read.delim(nucmerfile,as.is=TRUE,skip=4,header=FALSE)
   colnames(nucmer)<-c("rpos","rvar","qvar","qpos","","","","","rlength","qlength","","","rname","qname")
+  nrow(nucmer) # 648067
+  
+  # Load previous variant list (for incremental annotation)
+  if(!is.null(prevnucmerfile)){
+    prevnucmer<-read.delim(prevnucmerfile,as.is=TRUE,skip=4,header=FALSE)
+    colnames(prevnucmer)<-c("rpos","rvar","qvar","qpos","","","","","rlength","qlength","","","rname","qname")
+    nucmer<-nucmer[!nucmer$qname%in%unique(prevnucmer$qname),]
+  }
+  nrow(nucmer) # 119612
   rownames(nucmer)<-paste0("var",1:nrow(nucmer))
-  nrow(nucmer) # 69989
   
   # Fix IUPAC codes
   table(nucmer$qvar)
+  nucmer$qvar[nucmer$qvar=="U"]<-"T"
   nucmer<-nucmer[!nucmer$qvar%in%c("B","D","H","K","M","N","R","S","V","W","Y"),]
   nrow(nucmer) # 69980
   
   
   ### Aminoacid variant list ----
   # Load reference sequence
-  library(seqinr)
-  library(Biostrings)
   refseq<-read.fasta(genomefasta,forceDNAtolower=FALSE)[[1]]
   
   # Load GFF3
@@ -167,7 +177,7 @@ annotator<-function(nucmerfile,genomefasta,genomegff3){
             varpepseq<-Biostrings::translate(vardnaseq)
             varpepseq<-strsplit(as.character(varpepseq),"")[[1]]
             
-            for(j in 1:length(refpepseq)){
+            for(j in 1:min(c(length(refpepseq)),length(varpepseq))){
               refj<-refpepseq[j]
               varj<-varpepseq[j]
               if(refj!=varj){
@@ -257,7 +267,7 @@ annotator<-function(nucmerfile,genomefasta,genomegff3){
           }
         }
       }
-      results<-rbind(results,c(sample,rpos,rvar,qvar,qpos,qlength,protein,output,annot[protein]))
+      results<-rbind(results,c(sample,rpos,rvar,qvar,qpos,qlength,protein[1],output,annot[protein[1]]))
     }
     setTxtProgressBar(pb,pbi)
   }
