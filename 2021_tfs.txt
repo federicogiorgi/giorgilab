@@ -1,4 +1,7 @@
-All 2400 human Transcription Factors, manually curated by our lab in 2021 (cit. https://doi.org/10.3390/biom11020177) based on the Gene Ontology term "Regulation of Transcription, DNA-templated" (GO:0006355). It probably contains some false positives (co-regulation of transcriptions) and surely lots of zinc fingers! Stay tuned to our twitter account @giorgilab for more fringe #Bioinformatics!
+All 2400 human Transcription Factors, manually curated by our lab in 2021 (cit. https://doi.org/10.3390/biom11020177)
+It is based on the Gene Ontology term "Regulation of Transcription, DNA-templated" (GO:0006355).
+It probably contains some false positives (co-regulation of transcriptions) and surely lots of zinc fingers!
+Stay tuned to our twitter account @giorgilab https://twitter.com/giorgilab for more fringe #Bioinformatics!
 ABHD14B
 ABT1
 ACTL6A
